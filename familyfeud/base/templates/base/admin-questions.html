@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>Button</title>
+</head>
+<style>
+    td {
+        border: 1px solid black;
+    }
+
+    .answer-group {
+        background-color: black !important;
+    }
+
+    .half-row {
+        min-width: 50%;
+    }
+
+    .answers-table {
+        width: 800px;
+    }
+
+    .answer-text {
+        width: 45%;
+    }
+
+    .answer-value {
+        width: 5%;
+        text-align: center;
+    }
+    td {
+        height: 25px;
+    }
+</style>
+<body>
+    <div id="app">
+        <h1>Questions</h1>
+        <table class='answers-table'>
+            <tr v-for="(answer, index) in answers.slice(0,4)">
+                <td class="answer-text"><p>[[ getAnswerInfo(index, 'text') ]]<button v-on:click="sendMessage(getAnswerInfo(index, 'id'))">Display it!</button></p></td>
+                <td class="answer-value"><p>[[ getAnswerInfo(index, 'value')]]</p></td>
+                <td class="answer-text"><p>[[ getAnswerInfo(index+4, 'text') ]] <button v-on:click="sendMessage(getAnswerInfo(index+4, 'id'))">Display it!</button></p></td>
+                <td class="answer-value"><p>[[ getAnswerInfo(index+4, 'value') ]]</p></td>
+            </tr>
+        </table>
+        <button class="btn btn-danger" v-on:click="addWrongAnswer">WRONG ANSWER</button>
+    </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
+    answer_list = {{answers}}
+    answer_list.sort(function (a, b) { return (a.value < b.value) ? 1 : -1}) // We sort the answers by score value so that the highest value is first,
+    answer_list.forEach(function(element) {
+        element.displayIt = true;
+    })
+    
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: '#app',
+        data: {
+            showHello: false,
+            displaySocket: new WebSocket(
+                'ws://' + window.location.host + '/ws/display_answer/'
+            ),
+            answers: answer_list
+        },
+        methods: {
+            sendMessage: function(question_id) {
+                this.displaySocket.send(JSON.stringify({
+                    'action': 'revealAnswer',
+                    'question_id': question_id
+                }))
+            },
+            receiveMessage: function (e) {
+                console.log(e)
+                var data = JSON.parse(e.data);
+                question_id = data['question_id']
+                this.answers.forEach(function(element) {
+                    if (element.id == question_id) {
+                        element.displayIt = !element.displayIt
+                    }
+                })
+            },
+            addWrongAnswer: function(e) {
+                this.displaySocket.send(JSON.stringify({
+                    'action': 'addWrong',
+                }))
+            },
+            getAnswerInfo: function (number, data) { // Supply the answer number (the order it's in the array, the highest value one being '1') and the data you need, 'text' or 'value'
+                // We're using this to handle undefined values since we won't alway have 8 questions
+                if (this.answers[number]) {
+                    return this.answers[number][data]
+                } else {
+                    return ''
+                }
+
+            }
+        }
+    })
+
+    app.displaySocket.onmessage = function(e) {
+        app.receiveMessage(e);
+    }  
+</script>
+</html>
