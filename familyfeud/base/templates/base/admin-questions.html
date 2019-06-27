@@ -47,12 +47,18 @@
                 <td class="answer-value"><p>[[ getAnswerInfo(index+4, 'value') ]]</p></td>
             </tr>
         </table>
+        <p v-for="game in games">[[game]]</p>
         <button class="btn btn-danger" v-on:click="addWrongAnswer">WRONG ANSWER</button>
+        <button v-on:click="createNewGame">Goooo!</button>
     </div>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
+    axios.defaults.xsrfCookieName = 'csrftoken'
+    axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
     answer_list = {{answers}}
+    game_list = {{games}}
     answer_list.sort(function (a, b) { return (a.value < b.value) ? 1 : -1}) // We sort the answers by score value so that the highest value is first,
     answer_list.forEach(function(element) {
         element.displayIt = true;
@@ -66,7 +72,8 @@
             displaySocket: new WebSocket(
                 'ws://' + window.location.host + '/ws/display_answer/'
             ),
-            answers: answer_list
+            answers: answer_list,
+            games: game_list
         },
         methods: {
             sendMessage: function(question_id) {
@@ -86,9 +93,21 @@
                 })
             },
             addWrongAnswer: function(e) {
-                this.displaySocket.send(JSON.stringify({
-                    'action': 'addWrong',
-                }))
+                axios({
+                    method: 'post',
+                    url: '/base/admin/addWrong/'
+                }).then(function (response) {
+                    console.log(response)
+                })
+            },
+            createNewGame: function(e) {
+                console.log("Working...")
+                axios({
+                    method: 'post',
+                    url: '/base/admin/createGame/'
+                }).then(function (response) {
+                    console.log('bueno')
+                })
             },
             getAnswerInfo: function (number, data) { // Supply the answer number (the order it's in the array, the highest value one being '1') and the data you need, 'text' or 'value'
                 // We're using this to handle undefined values since we won't alway have 8 questions
