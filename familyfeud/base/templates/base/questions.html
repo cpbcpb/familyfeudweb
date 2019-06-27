@@ -80,6 +80,7 @@
             receiveMessage: function (e) {
                 var data = JSON.parse(e.data);
                 var action = data['action']
+                console.log(data)
 
                 if (action === 'revealAnswer') {
                     question_id = data['question_id']
@@ -96,6 +97,7 @@
                         this.wrongAnswers += 1
                     }
                 }
+                
 
             },
             getPointSum: function () {

@@ -32,4 +32,6 @@ class GameStatus(models.Model):
     question_total = models.IntegerField(default=0)
     question_total_wrong = models.IntegerField(default=0)
     displayed_answers = models.CharField(default='{"displayed":[]}', max_length=1000)
+    display_logo = models.BooleanField(default=True)
     create_date = models.DateTimeField(default=now)
+    new_displayed_answers = models.ManyToManyField(Answer)

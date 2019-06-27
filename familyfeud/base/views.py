@@ -6,6 +6,8 @@ from django.db.models import Q
 from .models import Question, Game, Answer, GameStatus
 from channels.layers import get_channel_layer
 from django.views.decorators.csrf import csrf_exempt
+from django.core import serializers
+
 
 import json
 
@@ -60,49 +62,130 @@ def gamelist(request):
         'games': mark_safe(json.dumps(gamelist))
     })
 
-def addWrong(request):
-    if request.method == 'POST':
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            '{}'.format('displayanswer_base'),
-            {
-                'type': 'add_wrong',
-                'action': 'addWrong'
-            }
-        )
-        return JsonResponse({'isSucessful': True})
+def send_current_game_state(game_state):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        'displayanswer_base',
+        {
+            'type': 'send_state',
+            'state': game_state
+        }
+    )
 
-# This creates an empty game status in the database
+def get_current_game_state_as_dict():
+    current_game_status = json.loads(serializers.serialize("json", [getCurrentGameStatus()]))
+    return current_game_status[0]['fields']
+
 @csrf_exempt
 def createNewGame(request):
+    """ Creates a new 'GameStatus'. Supply the id of the 'game' you wish to use using 'game' as form data."""
     if request.method == 'POST':
         try:
-            currentGame = Game.objects.get(pk=request.POST['game'])
-            newGameStatus = GameStatus.objects.create(current_game=currentGame)
-            currentQuestion = Question.objects.filter(game=currentGame).order_by('question_order')[0] # Get the first question in the seleced game
-            newGameStatus.current_question = currentQuestion
-            newGameStatus.save()
+            current_game = Game.objects.get(pk=request.POST['game'])
+            new_game_status = GameStatus.objects.create(current_game=current_game)
+            first_question = Question.objects.filter(game=current_game).order_by('question_order')[0] # Get the first question in the seleced game
+            new_game_status.current_question = first_question
+            new_game_status.save()
         except Exception as e:
             print(e)
             return JsonResponse({'isSucessful': False})
-        return JsonResponse({'isSucessful': True, 'gameId': newGameStatus.pk})
+        send_current_game_state(get_current_game_state_as_dict())
+        return JsonResponse({'isSucessful': True, 'gameId': new_game_status.pk})
 
 @csrf_exempt
 def nextQuestion(request):
+    """ Finds the next question and makes it the current_question. Also resets values such as question_total and total_wrong. """
     if request.method == 'POST':
         try:
-            currentGameStatus = getCurrentGameStatus()
-            order = currentGameStatus.current_question.question_order
-            nextQuestion = Question.objects.filter(Q(game=currentGameStatus.current_game) & Q(question_order__gt=order)).order_by('question_order')
-            if nextQuestion.count() == 0:
+            current_game_status = getCurrentGameStatus()
+            order = current_game_status.current_question.question_order
+            next_question = Question.objects.filter(Q(game=current_game_status.current_game) & Q(question_order__gt=order)).order_by('question_order')
+            if next_question.count() == 0:
                 return JsonResponse({'isSucessful': True, 'text': 'Last Question reached.'})
-            currentGameStatus.current_question = nextQuestion[0]
-            currentGameStatus.save()
+            current_game_status.current_question = next_question[0]
+            current_game_status.displayed_answers = '{"displayed":[]}'
+            current_game_status.question_total = 0
+            current_game_status.question_total_wrong = 0
+            current_game_status.display_logo = True
+            current_game_status.save()
         except Exception as e:
             print(e)
             return JsonResponse({'isSucessful': False})
-        return JsonResponse({'isSucessful': True, 'orderId': nextQuestion[0].question_text})
+        send_current_game_state(get_current_game_state_as_dict())
+        return JsonResponse({'isSucessful': True, 'orderId': next_question[0].question_text})
 
 @csrf_exempt
-def displayAnswer():
-    pass
+def displayAnswer(request):
+    """ Pass in an 'answerId' as formdata to add it to the 'currently_displayed' array and add it's value to the question_total. """
+    if request.method == 'POST':
+        try:
+            answer_id = request.POST['answerId']
+            current_game_status = getCurrentGameStatus()
+
+            answer_to_display = Answer.objects.filter(pk=answer_id)  # Get the answer associated the id
+            if not answer_to_display:  # No answer with that ID found
+                return JsonResponse({'isSucessful': False, 'errorText': 'Answer does not exist.'})
+            if answer_to_display[0].question_id != current_game_status.current_question.pk:  # Answer is not for the current question.
+                return JsonResponse({'isSucessful': False, 'errorText': 'That answer does not belong to the current question.'})
+
+            currently_displayed = json.loads(current_game_status.displayed_answers)['displayed']
+            if answer_id not in currently_displayed:  # Append if answer is not already displayed
+                currently_displayed.append(answer_id)
+                current_game_status.question_total += answer_to_display[0].point_value
+                current_game_status.new_displayed_answers.add(answer_to_display[0])
+            updated_json = json.dumps({'displayed': currently_displayed})
+            current_game_status.displayed_answers = updated_json
+            current_game_status.save()      
+        except Exception as e:
+            print(e)
+            return JsonResponse({'isSucessful': False})
+        send_current_game_state(get_current_game_state_as_dict())
+        return JsonResponse({'isSucessful': True, 'currentlyDisplayed': currently_displayed})
+
+@csrf_exempt
+def addWrong(request):
+    """ Adds a single one to the current question_total_wrong, setting it back to 0 if it reaches 4. """
+    if request.method == 'POST':
+        current_game_status = getCurrentGameStatus()
+        current_game_status.question_total_wrong += 1
+        if current_game_status.question_total_wrong >= 4:
+            current_game_status.question_total_wrong = 0
+        current_game_status.save()
+        send_current_game_state(get_current_game_state_as_dict())
+        return JsonResponse({'isSucessful': True, 'currentWrong': current_game_status.question_total_wrong})
+
+@csrf_exempt
+def awardPoints(request):
+    """ Award points of question_total to a given team. Pass in 'teamToReward' as either 'one' or 'two' to award the points. """
+    if request.method == 'POST':
+        team_to_reward = request.POST['teamToReward']
+        if team_to_reward != 'one' and team_to_reward != 'two':
+            print(team_to_reward)
+            return JsonResponse({'isSucessful': False, 'errorText': 'Please pick team "one" or team "two"'})
+        current_game_status = getCurrentGameStatus()
+        if team_to_reward == 'one':
+            current_game_status.team_1_score += current_game_status.question_total
+        elif team_to_reward == 'two':
+            current_game_status.team_2_score += current_game_status.question_total
+        current_game_status.question_total = 0
+        current_game_status.save()
+        send_current_game_state(get_current_game_state_as_dict())
+        return JsonResponse({'isSucessful': True, 'team_1_score': current_game_status.team_1_score, 'team_2_score': current_game_status.team_2_score})
+
+@csrf_exempt
+def revealBoard(request):
+    if request.method == 'POST':
+        current_game_status = getCurrentGameStatus()
+        current_game_status.display_logo = False
+        current_game_status.save()
+        send_current_game_state(get_current_game_state_as_dict())
+        return JsonResponse({'isSucessful': True})
+
+@csrf_exempt
+def hideBoard(request):
+    if request.method == 'POST':
+        current_game_status = getCurrentGameStatus()
+        current_game_status.display_logo = True
+        current_game_status.save()
+        send_current_game_state(get_current_game_state_as_dict())
+        return JsonResponse({'isSucessful': True})
