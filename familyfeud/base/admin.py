@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Question, Game, Answer, GameStatus
+from .models import Question, QuestionSet, Answer, GameStatus
 # Register your models here.
 
 
@@ -18,11 +18,11 @@ class QuestionAdmin(admin.ModelAdmin):
     inlines = [ChoiceInline]
 
 
-class GameAdmin(admin.ModelAdmin):
+class QuestionSetAdmin(admin.ModelAdmin):
     inlines = [QuestionInline]
 
 
 admin.site.register(Question, QuestionAdmin)
-admin.site.register(Game, GameAdmin)
+admin.site.register(QuestionSet, QuestionSetAdmin)
 admin.site.register(Answer)
 admin.site.register(GameStatus)

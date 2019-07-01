@@ -1,0 +1,48 @@
+{
+    "team_1_score": 0,
+    "team_2_score": 0,
+    "question_total": 32,
+    "total_wrong": 1,
+    "current_game_id": 2,
+    "current_question": {
+        "id": 2,
+        "question_text": "Name something you put in your mouth but don't swallow.",
+        "game": 2,
+        "question_order": 200
+    },
+    "create_date": "2019-06-27 20:50:45.480663+00:00",
+    "display_logo": true,
+    "current_answers": [
+        {
+            "id": 8,
+            "question_id": 2,
+            "answer_text": "Gum",
+            "point_value": 38,
+            "currently_displayed": true
+        },
+        {
+            "id": 9,
+            "question_id": 2,
+            "answer_text": "Toothpaste / Toothbrush",
+            "point_value": 12
+        },
+        {
+            "id": 10,
+            "question_id": 2,
+            "answer_text": "Mouthwash",
+            "point_value": 9
+        },
+        {
+            "id": 11,
+            "question_id": 2,
+            "answer_text": "Lollipop",
+            "point_value": 6
+        },
+        {
+            "id": 12,
+            "question_id": 2,
+            "answer_text": "Thermometer",
+            "point_value": 5
+        }
+    ]
+}

@@ -22,6 +22,8 @@
 
     .answers-table {
         width: 800px;
+        text-align: left;
+        margin: 20px auto;
     }
 
     .answer-text {
@@ -35,21 +37,146 @@
     td {
         height: 25px;
     }
+    .answer-text p {
+        display: inline;
+    }
+
+    .newGameSection {
+        border: 3px solid black;
+        border-radius:5px;
+        display: inline-block;
+        text-align: center;
+        margin: 0 auto;
+        padding: 15px;
+    }
+    .newGameSectionWrapper {
+        text-align: center
+    }
+
+    .controls {
+        padding: 30px;
+    }
+
+    .question-info {
+        text-align: center;
+        border: 3px solid black;
+        border-radius:5px;
+        padding: 10px 0;
+    }
+
+    .wrong-count {
+        color: red;
+        font-size: 50px;
+    }
+
+    .wrong-placeholder {
+        color: black;
+    }
+
+    .scores {
+        text-align: center;
+    }
+
+    .scores h3 {
+        font-weight: bold;
+        text-decoration: underline;
+    }
+
+    .edit-scores {
+        text-align: left;
+        margin: 5px auto;
+        display: inline-block;
+        padding: 10px;
+        border: 1.5px solid black;
+    }
+    
+    .wrong {
+        margin-right: 10px;
+    }
+
+    .edit-wrong {
+        margin: 5px auto;
+        display: inline-block;
+        padding: 10px;
+        border: 1.5px solid black;
+    }
+    
+    .edit-wrong button {
+        margin-bottom: 5px;
+    }
 </style>
 <body>
     <div id="app">
-        <h1>Questions</h1>
-        <table class='answers-table'>
-            <tr v-for="(answer, index) in answers.slice(0,4)">
-                <td class="answer-text"><p>[[ getAnswerInfo(index, 'text') ]]<button v-on:click="sendMessage(getAnswerInfo(index, 'id'))">Display it!</button></p></td>
-                <td class="answer-value"><p>[[ getAnswerInfo(index, 'value')]]</p></td>
-                <td class="answer-text"><p>[[ getAnswerInfo(index+4, 'text') ]] <button v-on:click="sendMessage(getAnswerInfo(index+4, 'id'))">Display it!</button></p></td>
-                <td class="answer-value"><p>[[ getAnswerInfo(index+4, 'value') ]]</p></td>
-            </tr>
-        </table>
-        <p v-for="game in games">[[game]]</p>
-        <button class="btn btn-danger" v-on:click="addWrongAnswer">WRONG ANSWER</button>
-        <button v-on:click="createNewGame">Goooo!</button>
+        <div class="newGameSectionWrapper">
+            <div class="newGameSection">
+                <h2>Start a new game!</h2>
+                <select class="form-control" v-model="gameToStart">
+                    <option value="0" disabled>SELECT A QUESTION SET</option>
+                    <option v-for="question_set in question_sets" v-bind:value="question_set.id">[[question_set.friendly_name]]</option>
+                </select><br>
+                <button class="btn btn-primary" v-on:click="createNewGame(gameToStart)">Start New Game!</button>
+            </div>
+        </div>
+        <div class="controls" v-if="!state.no_active_game">
+            <div class="scores">
+                <h3>Scores</h3>
+                <h4>Team 1: [[ state.team_1_score ]]</h4>
+                <h4>Team 2: [[ state.team_2_score ]]</h4>
+                <button v-on:click="revealEditScore" class="btn btn-primary">Manually Edit Scores</button><br>
+                <div v-if="showEditScore" class="edit-scores">
+                    <label for="team_1_score">Team 1: </label><input class="form-control-inline" type="number" v-model="editTeam1"><br>
+                    <label for="team_2_score">Team 2: </label><input class="form-control-inline" type="number" v-model="editTeam2"><br>
+                    <button v-on:click="submitEditScore" class="btn btn-success">Update</button>
+                    <button v-on:click="showEditScore = false" class="btn btn-danger">Cancel</button>
+                </div>
+            </div>
+            <div class="question-info">
+                <button v-on:click="revealBoard" v-if="state.display_logo" class="btn btn-success"> Reveal Board! </button>
+                <button v-on:click="hideBoard" v-if="!state.display_logo" class="btn btn-danger"> Hide Board </button>
+                <h3>Current Question: [[state.current_question.question_text]]</h3>
+                <h4>Total: [[state.question_total]]</h4>
+                <button v-on:click="awardPoints('one')" class="btn btn-primary">Award Team 1 Points</button>
+                <button v-on:click="awardPoints('two')" class="btn btn-primary">Award Team 2 Points</button>
+                <table class='answers-table'>
+                    <tr v-for="(answer, index) in state.current_answers.slice(0,4)">
+                        <td class="answer-text">
+                            <p>[[ getAnswerInfo(index, 'answer_text') ]]</p>
+                            <button class="btn btn-success" v-if="!getAnswerInfo(index, 'currently_displayed')" v-on:click="displayAnswer(getAnswerInfo(index, 'id'))">Display it!</button>
+                            <button class="btn btn-danger" v-if="getAnswerInfo(index, 'currently_displayed')" v-on:click="hideAnswer(getAnswerInfo(index, 'id'))">Hide It!</button>
+                        </td>
+                        <td class="answer-value">
+                            <p>[[ getAnswerInfo(index, 'point_value')]]</p>
+                        </td>
+                        <td class="answer-text">
+                            <p>[[ getAnswerInfo(index+4, 'answer_text') ]]</p>
+                            <button class="btn btn-success" v-if="!getAnswerInfo(index+4, 'currently_displayed') && getAnswerInfo(index+4, 'currently_displayed') !== ''" v-on:click="displayAnswer(getAnswerInfo(index+4, 'id'))">Display it!</button>
+                            <button class="btn btn-danger" v-if="getAnswerInfo(index+4, 'currently_displayed')" v-on:click="hideAnswer(getAnswerInfo(index+4, 'id'))">Hide It!</button>
+                        </td>
+                        <td class="answer-value">
+                            <p>[[ getAnswerInfo(index+4, 'point_value') ]]</p>
+                        </td>
+                    </tr>
+                </table>
+                <button class="btn btn-danger wrong" v-on:click="addWrongAnswer">WRONG ANSWER</button>
+                <button class="btn btn-primary" v-on:click="showSingleX">Show Single X</button>
+                <br>
+                <b class="wrong-count" v-for="n in state.total_wrong">X </b>
+                <b class="wrong-count wrong-placeholder" v-for="n in 3 - state.total_wrong"> _</b>
+                <br>
+                <button v-on:click="revealEditWrong" class="btn btn-primary">Manually Edit Total Wrong</button><br>
+                <div v-if="showEditWrong" class="edit-wrong">
+                    <select class="form-control" v-model="editTotalWrong">
+                        <option v-for="n in 4" :value="n-1">[[n-1]]</option>
+                    </select>
+                    <br>
+                    <button v-on:click="submitEditWrong('1')" class="btn btn-primary">Update and Buzz</button>
+                    <button v-on:click="submitEditWrong('0')" class="btn btn-success">Update Silently</button>
+                    <br>
+                    <button v-on:click="showEditWrong = false" class="btn btn-danger">Cancel</button>
+                </div>
+            </div>
+            <button v-on:click="nextQuestion" class="btn btn-primary">Go to the Next Question!</button>
+        </div>
     </div>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
@@ -57,38 +184,51 @@
 <script>
     axios.defaults.xsrfCookieName = 'csrftoken'
     axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
-    answer_list = {{answers}}
-    game_list = {{games}}
-    answer_list.sort(function (a, b) { return (a.value < b.value) ? 1 : -1}) // We sort the answers by score value so that the highest value is first,
-    answer_list.forEach(function(element) {
-        element.displayIt = true;
-    })
-    
+    question_set_list = {{question_sets}}
+    state = {{state}}
+
+    if (!state.no_active_game) {
+        state.current_answers.sort(function (a, b) { return (a.point_value < b.point_value) ? 1 : -1}) // We sort the answers by score value so that the highest value is first,
+    }
+
     var app = new Vue({
         delimiters: ['[[', ']]'],
         el: '#app',
         data: {
             showHello: false,
-            displaySocket: new WebSocket(
-                'ws://' + window.location.host + '/ws/display_answer/'
-            ),
-            answers: answer_list,
-            games: game_list
+            question_sets: question_set_list,
+            state: state,
+            gameToStart: 0,
+            showEditScore: false,
+            editTeam1: 0,
+            editTeam2: 0,
+            showEditWrong: false,
+            editTotalWrong: 0
         },
         methods: {
-            sendMessage: function(question_id) {
-                this.displaySocket.send(JSON.stringify({
-                    'action': 'revealAnswer',
-                    'question_id': question_id
-                }))
+            displayAnswer: function(answerId) {
+                var formData = new FormData()
+                formData.set('answerId', answerId)
+                axios({
+                    method: 'post',
+                    url: '/base/admin/displayAnswer/',
+                    data: formData
+                }).then(function (response) {
+                    if (response['data']['isSuccessful']) {
+                        app.state = response['data']['state']
+                    }
+                })
             },
-            receiveMessage: function (e) {
-                console.log(e)
-                var data = JSON.parse(e.data);
-                question_id = data['question_id']
-                this.answers.forEach(function(element) {
-                    if (element.id == question_id) {
-                        element.displayIt = !element.displayIt
+            hideAnswer: function(answerId) {
+                var formData = new FormData()
+                formData.set('answerId', answerId)
+                axios({
+                    method: 'post',
+                    url: '/base/admin/hideAnswer/',
+                    data: formData
+                }).then(function (response) {
+                    if (response['data']['isSuccessful']) {
+                        app.state = response['data']['state']
                     }
                 })
             },
@@ -97,32 +237,127 @@
                     method: 'post',
                     url: '/base/admin/addWrong/'
                 }).then(function (response) {
-                    console.log(response)
+                    if (response['data']['isSuccessful']) {
+                        app.state = response['data']['state']
+                    }
                 })
             },
-            createNewGame: function(e) {
-                console.log("Working...")
+            awardPoints: function(team) {
+                var formData = new FormData()
+                formData.set('teamToReward', team)
                 axios({
                     method: 'post',
-                    url: '/base/admin/createGame/'
+                    url: '/base/admin/awardPoints/',
+                    data: formData
                 }).then(function (response) {
-                    console.log('bueno')
+                    if (response['data']['isSuccessful']) {
+                        app.state = response['data']['state']
+                    }
+                })
+            },
+            nextQuestion: function() {
+                axios({
+                    method: 'post',
+                    url: '/base/admin/nextQuestion/'
+                }).then(function (response) {
+                    if (response['data']['isSuccessful']) {
+                        app.state = response['data']['state']
+                    }
+                })
+            },
+            showSingleX: function() {
+                axios({
+                    method: 'post',
+                    url: '/base/admin/showSingleX/'
+                }).then(function (response) {
+                })
+            },
+            createNewGame: function(gameId) {
+                var formData = new FormData()
+                formData.set('game', gameId)
+                axios({
+                    method: 'post',
+                    url: '/base/admin/createGame/',
+                    data: formData
+                }).then(function (response) {
+                    if (response['data']['isSuccessful']) {
+                        app.state = response['data']['state']
+                    }
                 })
             },
             getAnswerInfo: function (number, data) { // Supply the answer number (the order it's in the array, the highest value one being '1') and the data you need, 'text' or 'value'
                 // We're using this to handle undefined values since we won't alway have 8 questions
-                if (this.answers[number]) {
-                    return this.answers[number][data]
+                if (this.state.current_answers[number]) {
+                    return this.state.current_answers[number][data]
                 } else {
                     return ''
                 }
 
+            },
+            revealEditScore: function() {
+                this.editTeam1 = this.state.team_1_score;
+                this.editTeam2 = this.state.team_2_score;
+                this.showEditScore = true;
+            },
+            submitEditScore: function() {
+                var formData = new FormData()
+                formData.set('teamOnePoints', this.editTeam1)
+                formData.set('teamTwoPoints', this.editTeam2)
+                axios({
+                    method: 'post',
+                    url: '/base/admin/editPoints/',
+                    data: formData
+                }).then(function (response) {
+                    console.log(response)
+                    if (response['data']['isSuccessful']) {
+                        app.state = response['data']['state']
+                    }
+                })
+                this.showEditScore = false;
+            },
+            revealBoard: function() {
+                axios({
+                    method: 'post',
+                    url: '/base/admin/revealBoard/'
+                }).then(function (response) {
+                    if (response['data']['isSuccessful']) {
+                        app.state = response['data']['state']
+                    }
+                })
+            },
+            hideBoard: function() {
+                axios({
+                    method: 'post',
+                    url: '/base/admin/hideBoard/'
+                }).then(function (response) {
+                    if (response['data']['isSuccessful']) {
+                        app.state = response['data']['state']
+                    }
+                })
+            },
+            revealEditWrong: function () {
+                this.editTotalWrong = this.state.total_wrong;
+                console.log(this.state.total_wrong)
+                this.showEditWrong = true;
+            },
+            submitEditWrong: function(showBuzzer) {
+                var formData = new FormData()
+                formData.set('totalWrong', this.editTotalWrong)
+                formData.set('showBuzzer', showBuzzer)
+                console.log(showBuzzer)
+                axios({
+                    method: 'post',
+                    url: '/base/admin/editTotalWrong/',
+                    data: formData
+                }).then(function (response) {
+                    console.log(response)
+                    if (response['data']['isSuccessful']) {
+                        app.state = response['data']['state']
+                    }
+                })
+                this.showEditWrong = false;
             }
         }
     })
-
-    app.displaySocket.onmessage = function(e) {
-        app.receiveMessage(e);
-    }  
 </script>
 </html>
