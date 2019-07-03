@@ -1,1 +1,3 @@
 ./familyfeud/base/migrations/
+./familyfeud/familyfeud/__pycache__/
+familyfeud/base/migrations/__pycache__/
