@@ -1,3 +1,5 @@
 ./familyfeud/base/migrations/
 ./familyfeud/familyfeud/__pycache__/
 familyfeud/base/migrations/__pycache__/
+familyfeud/base/__pycache__/
+familyfeud/db.sqlite3
