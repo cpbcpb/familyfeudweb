@@ -11,6 +11,11 @@ from django.forms.models import model_to_dict
 
 import json
 
+# view for the game board.  
+def game(request):
+    return render(request, 'base/game_board.html', {
+    })
+
 def getCurrentGameStatus():
     if len(GameStatus.objects.filter().order_by('-create_date')) == 0:
         return {}

@@ -1,0 +1,393 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" 
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>Game Board</title>
+</head>
+<body>
+<div id="app">
+[[websocketJson]]
+    <div class="logo-oval" v-show="websocketJson.display_logo">
+        <div class="logo-text-box" >
+            <div>
+                <span class="first-letter" data-text="C">C</span>
+                <span data-text="OUNT">OUNT</span>
+                <span class="y" data-text="y">y</span>
+            </div>
+            <div>
+                <span class="first-letter" data-text="F">F</span>
+                <span data-text="EUD">EUD</span>
+            </div>
+        </div>
+    </div>
+    <div class="game-grid" v-show="!websocketJson.display_logo">
+        <div class="game-column container">
+            <div class="answer-box row" v-if="sortedAnswers[0]">
+                <div class="number" v-show="!sortedAnswers[0].currently_displayed">1</div>
+                <div class="answer-text col-10" v-show="sortedAnswers[0].currently_displayed">[[sortedAnswers[0].answer_text]]</div>
+                <div class="answer-points col-2" v-show="sortedAnswers[0].currently_displayed">[[sortedAnswers[0].point_value]]</div>
+            </div>
+            <div v-else  class="answer-box row">
+            </div>
+            <div class="answer-box row" v-if="sortedAnswers[1]">
+                <div class="number" v-show="!sortedAnswers[1].currently_displayed">2</div>
+                <div class="answer-text col-10" v-show="sortedAnswers[1].currently_displayed">[[sortedAnswers[1].answer_text]]</div>
+                <div class="answer-points col-2" v-show="sortedAnswers[1].currently_displayed">[[sortedAnswers[1].point_value]]</div>
+            </div>
+            <div v-else  class="answer-box row">
+            </div>
+            <div class="answer-box row" v-if="sortedAnswers[2]">
+                <div class="number" v-show="!sortedAnswers[2].currently_displayed">3</div>
+                <div class="answer-text col-10" v-show="sortedAnswers[2].currently_displayed">[[sortedAnswers[2].answer_text]]</div>
+                <div class="answer-points col-2" v-show="sortedAnswers[2].currently_displayed">[[sortedAnswers[2].point_value]]</div>
+            </div>
+            <div v-else  class="answer-box row">
+            </div>
+            <div class="answer-box row" v-if="sortedAnswers[3]">
+                <div class="number" v-show="!sortedAnswers[3].currently_displayed">4</div>
+                <div class="answer-text col-10" v-show="sortedAnswers[3].currently_displayed">[[sortedAnswers[3].answer_text]]</div>
+                <div class="answer-points col-2" v-show="sortedAnswers[3].currently_displayed">[[sortedAnswers[3].point_value]]</div>
+            </div>
+            <div v-else  class="answer-box row">
+            </div>
+        </div>
+        <div class="game-column container">
+            <div class="answer-box row" v-if="sortedAnswers[4]">
+                <div class="number" v-show="!sortedAnswers[4].currently_displayed">5</div>
+                <div class="answer-text col-10" v-show="sortedAnswers[4].currently_displayed">[[sortedAnswers[4].answer_text]]</div>
+                <div class="answer-points col-2" v-show="sortedAnswers[4].currently_displayed">[[sortedAnswers[4].point_value]]</div>
+            </div>
+            <div v-else  class="answer-box row">
+            </div>
+            <div class="answer-box row" v-if="sortedAnswers[5]">
+                <div class="number" v-show="!sortedAnswers[5].currently_displayed">6</div>
+                <div class="answer-text col-10" v-show="sortedAnswers[5].currently_displayed">[[sortedAnswers[5].answer_text]]</div>
+                <div class="answer-points col-2" v-show="sortedAnswers[5].currently_displayed">[[sortedAnswers[5].point_value]]</div>
+            </div>
+            <div v-else  class="answer-box row">
+            </div>
+            <div class="answer-box row" v-if="sortedAnswers[6]">
+                <div class="number" v-show="!sortedAnswers[6].currently_displayed">7</div>
+                <div class="answer-text col-10" v-show="sortedAnswers[6].currently_displayed">[[sortedAnswers[6].answer_text]]</div>
+                <div class="answer-points col-2" v-show="sortedAnswers[6].currently_displayed">[[sortedAnswers[6].point_value]]</div>
+            </div>
+            <div v-else  class="answer-box row">
+            </div>
+            <div class="answer-box row" v-if="sortedAnswers[7]">
+                <div class="number" v-show="!sortedAnswers[7].currently_displayed">8</div>
+                <div class="answer-text col-10" v-show="sortedAnswers[7].currently_displayed">[[sortedAnswers[7].answer_text]]</div>
+                <div class="answer-points col-2" v-show="sortedAnswers[7].currently_displayed">[[sortedAnswers[7].point_value]]</div>
+            </div>
+            <div v-else  class="answer-box row">
+            </div>
+        </div>
+        <strikes 
+            v-bind:show_total_wrong="websocketJson.show_total_wrong" 
+            v-bind:total_wrong="websocketJson.total_wrong" 
+            v-bind:show_single_x="websocketJson.show_single_x">
+        </strikes>
+    </div>
+
+</div>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
+
+    Vue.component('answer-box', {
+        delimiters: ['[[', ']]'],
+        data: function(){
+            return {
+            }
+        },
+        props: ['answer', 'index'],
+        template: 
+        `<div class="answer-box row">
+            <div class="number" v-show="!answer.show">[[index +1 ]]</div>
+                <div class="answer-text col-10" v-show="answer.show">[[answer.text]]</div>
+                <div class="answer-points col-2" v-show="answer.show">[[answer.points]]</div>
+        </div>
+        `
+    })
+    Vue.component('strikes', {
+        delimiters:['[[', ']]'],
+        data: function(){
+            return {
+            }
+        },
+        //In the dom these must be refered to in kebab case number-wrong, show-x, show-one-x.
+        props: ['total_wrong', 'show_total_wrong', 'show_single_x'],
+        template:
+        `
+            <div class="strikes row" v-show="show_total_wrong || show_single_x">
+                <img v-show="total_wrong>0 || show_single_x" class="col-4" src="{% static 'base/strike.png' %}" alt="strike">
+                <img v-show="total_wrong>1 && !show_single_x" class="col-4" src="{% static 'base/strike.png' %}" alt="strike">
+                <img v-show="total_wrong>2 && !show_single_x" class="col-4" src="{% static 'base/strike.png' %}" alt="strike">
+            </div>
+        `
+    })
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: '#app',
+        data: {
+            displaySocket: new Websocket(
+                'ws://' + window.location.host + 'ws/display/'
+            ),
+            websocketJson: {
+                "team_1_score": 0,
+                "team_2_score": 0,
+                "question_total": 0,
+                "total_wrong": 3,
+                "current_game_id": 3,
+                "current_question_id": 4,
+                "current_question": {
+                    "id": 4,
+                    "question_text": "When dating, women pretend to love sports. What do men pretend to love?",
+                    "game": 3,
+                    "question_order": 100
+                },
+                "create_date": "2019-07-02 13:20:38.032644+00:00",
+                "display_logo": true,
+                "current_answers": [
+                    {
+                        "id": 19,
+                        "question_id": 4,
+                        "answer_text": "Chick Flicks",
+                        "point_value": 33,
+                        "currently_displayed": true
+                    },
+                    {
+                        "id": 20,
+                        "question_id": 4,
+                        "answer_text": "Shopping",
+                        "point_value": 18,
+                        "currently_displayed": false
+                    },
+                    {
+                        "id": 21,
+                        "question_id": 4,
+                        "answer_text": "Arts",
+                        "point_value": 12,
+                        "currently_displayed": false
+                    },
+                    {
+                        "id": 22,
+                        "question_id": 4,
+                        "answer_text": "Talking",
+                        "point_value": 11,
+                        "currently_displayed": true
+                    },
+                    {
+                        "id": 24,
+                        "question_id": 4,
+                        "answer_text": "Kids",
+                        "point_value": 3,
+                        "currently_displayed": false
+                    },
+                    {
+                        "id": 23,
+                        "question_id": 4,
+                        "answer_text": "Cooking",
+                        "point_value": 3,
+                        "currently_displayed": false
+                    }
+                ],
+                "show_single_x": false,
+                "show_total_wrong": true,
+                "no_active_game": false
+            },
+        },
+        methods: {
+            receiveMessage: function (e) {
+                var data = JSON.parse(e.data);
+                this.websocketJson = data;
+            }
+        },
+        computed: {
+            sortedAnswers: function() {
+                return this.websocketJson.current_answers.sort((a,b) => (a.point_value > b.point_value) ? -1 : 1 )
+
+            }
+        }
+    })
+    app.displaySocket.onmessage = function(e) {
+        app.receiveMessage(e);
+    }
+</script>
+
+{% comment %} 
+
+    LOGO:
+        TEXT:
+            top of text fade orange:       #f26521
+            bottom of text fade yello:    #fef041
+        BACKGROUND:
+            flat middle blue:               #4c6db4
+
+
+ {% endcomment %}
+<style>
+
+
+
+
+#app {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 100vh;
+    width: 100vw;
+}
+.logo-oval {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 560px;
+    height: 300px;
+    margin:10px 0 0 -10px;  
+    border-radius: 560px / 300px;
+    border-style: double;
+    border-color: #4c6db4;
+    border-width: 20px;
+    position: relative;
+    background-color: brown;
+    z-index: 1;
+}
+.logo-oval:before {
+    background-image: radial-gradient(lightblue, dodgerblue),url('{% static 'base/blue_lights_bg.png' %}');
+    background-blend-mode: darken;
+    background-size: contain;
+    border: 4px solid white;
+    content: "";
+    display: block;
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    right: 1px;
+    bottom: 1px;
+    border-radius: 600px / 300px;
+    z-index: -2;
+}
+
+
+.logo-text-box {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.logo-text-box div span {
+  font-size: 100px;
+  font-weight: bold;
+  -webkit-text-stroke: 2px darkred;
+  display: inline-block;
+  font-family:   Courrier, Georgia, Palatino, Garamond, "Times New Roman", Sentinel, Bookman, Times;
+  background-image: -webkit-linear-gradient(#f26521, #fef041);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position:relative;
+  line-height: .75em;
+}
+
+.logo-text-box div span::after {
+    display: inline-block;
+  content: attr(data-text);
+  left: 0;
+  position: absolute;
+  text-shadow: 5px 5px 5px black;
+    -webkit-text-stroke: 5px white;
+  top: 0;
+  z-index: -1;
+}
+.first-letter {
+    font-size: 150px !important;
+    vertical-align: -20px;
+}
+.y {
+    font-size: 120px !important;
+    vertical-align: 10px;
+    line-height: 1.3em !important;
+}
+.game-grid {
+    display: flex;
+    flex-direction: row;
+    border-color: orange;
+    border-style: solid;
+    border-radius: 20px;
+    padding: 10px 10px 10px 10px;
+    background-color:black;
+    width: 840px;
+    height: 400px;
+}
+.game-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+
+}
+.answer-box {
+    display: flex;
+    justify-content: center;
+    background-image: radial-gradient(lightblue, dodgerblue, blue);
+    border-style: double;
+    border-color: grey;
+    border-width: 5px;
+    padding: 1px;
+    width: 400px;
+    height: 80px;
+}
+.answer-text {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-shadow: 2px .5px #000000;
+    font-size: 40px;
+    display: flex;
+    background-image: linear-gradient(dodgerblue, blue, darkblue );
+    height: 100%;
+    text-align: center;
+}
+.answer-points {
+    color: white;
+    text-shadow: 2px 1px #000000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    display: flex;
+    font-size: 40px;
+    text-align: center;
+    font-weight: bold;
+}
+.number {
+    background-color:darkblue;
+    color:white;
+    border-style: solid;
+    border-color: grey;
+    border-radius: .7em;
+    font-size: 55px;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: top;
+    width: 1.5em; 
+    line-height: 1.1em;
+    height: 1.2em;
+}
+.strikes {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    align-self: center;
+    width: inherit;
+}
+</style>
+</html>
