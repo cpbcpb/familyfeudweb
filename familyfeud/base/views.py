@@ -13,7 +13,10 @@ import json
 
 # view for the game board.  
 def game(request):
+    game_state = get_current_game_state_as_dict()
+
     return render(request, 'base/game_board.html', {
+        'state': mark_safe(json.dumps(game_state))
     })
 
 def getCurrentGameStatus():
