@@ -11,7 +11,8 @@
 </head>
 <body>
 <div id="app">
-    <div class="logo-oval" v-show="websocketJson.display_logo">
+[[state]]
+    <div class="logo-oval" v-show="state.display_logo">
         <div class="logo-text-box" >
             <div>
                 <span class="first-letter" data-text="C">C</span>
@@ -24,7 +25,16 @@
             </div>
         </div>
     </div>
-    <div class="game-grid" v-if="!websocketJson.display_logo">
+    <div class="score-top" v-if="!state.display_logo">
+        [[state.question_total]]
+    </div>
+        <div class="score-left" v-if="!state.display_logo">
+        [[state.team_1_score]]
+    </div>
+     <div class="score-right" v-if="!state.display_logo">
+        [[state.team_2_score]]
+    </div>
+    <div class="game-grid" v-if="!state.display_logo">
         <div class="game-column container">
             <div class="answer-box row" v-if="sortedAnswers[0]">
                 <div class="number" v-show="!sortedAnswers[0].currently_displayed">1</div>
@@ -86,9 +96,9 @@
             </div>
         </div>
         <strikes 
-            v-bind:show_total_wrong="websocketJson.show_total_wrong" 
-            v-bind:total_wrong="websocketJson.total_wrong" 
-            v-bind:show_single_x="websocketJson.show_single_x">
+            v-bind:show_total_wrong="state.show_total_wrong" 
+            v-bind:total_wrong="state.total_wrong" 
+            v-bind:show_single_x="state.show_single_x">
         </strikes>
     </div>
 
@@ -97,22 +107,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script>
-
-    Vue.component('answer-box', {
-        delimiters: ['[[', ']]'],
-        data: function(){
-            return {
-            }
-        },
-        props: ['answer', 'index'],
-        template: 
-        `<div class="answer-box row">
-            <div class="number" v-show="!answer.show">[[index +1 ]]</div>
-                <div class="answer-text col-10" v-show="answer.show">[[answer.text]]</div>
-                <div class="answer-points col-2" v-show="answer.show">[[answer.points]]</div>
-        </div>
-        `
-    })
     Vue.component('strikes', {
         delimiters:['[[', ']]'],
         data: function(){
@@ -137,22 +131,23 @@
             displaySocket: new WebSocket(
                 'ws://' + window.location.host + '/ws/display_answer/'
             ),
-            websocketJson: {display_logo: true
+            state: {display_logo: true
             },
         },
         methods: {
             receiveMessage: function (e) {
                 var data = JSON.parse(e.data);
-                this.websocketJson = data.state;
+                this.state = data.state;
             }
         },
         computed: {
             sortedAnswers: function() {
-                if(typeof this.websocketJson.current_answers !== "undefined"){
-                return this.websocketJson.current_answers.sort((a,b) => (a.point_value > b.point_value) ? -1 : 1 )
+                if(typeof this.state.current_answers !== "undefined"){
+                return this.state.current_answers.sort((a,b) => (a.point_value > b.point_value) ? -1 : 1 )
                 }
             }
-        }
+        },
+        
     })
     app.displaySocket.onmessage = function(e) {
         app.receiveMessage(e);
@@ -177,6 +172,7 @@
 
 #app {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
 
