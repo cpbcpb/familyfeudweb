@@ -11,7 +11,6 @@
 </head>
 <body>
 <div id="app">
-[[websocketJson]]
     <div class="logo-oval" v-show="websocketJson.display_logo">
         <div class="logo-text-box" >
             <div>
@@ -25,7 +24,7 @@
             </div>
         </div>
     </div>
-    <div class="game-grid" v-show="!websocketJson.display_logo">
+    <div class="game-grid" v-if="!websocketJson.display_logo">
         <div class="game-column container">
             <div class="answer-box row" v-if="sortedAnswers[0]">
                 <div class="number" v-show="!sortedAnswers[0].currently_displayed">1</div>
@@ -135,83 +134,23 @@
         delimiters: ['[[', ']]'],
         el: '#app',
         data: {
-            displaySocket: new Websocket(
-                'ws://' + window.location.host + 'ws/display/'
+            displaySocket: new WebSocket(
+                'ws://' + window.location.host + '/ws/display_answer/'
             ),
-            websocketJson: {
-                "team_1_score": 0,
-                "team_2_score": 0,
-                "question_total": 0,
-                "total_wrong": 3,
-                "current_game_id": 3,
-                "current_question_id": 4,
-                "current_question": {
-                    "id": 4,
-                    "question_text": "When dating, women pretend to love sports. What do men pretend to love?",
-                    "game": 3,
-                    "question_order": 100
-                },
-                "create_date": "2019-07-02 13:20:38.032644+00:00",
-                "display_logo": true,
-                "current_answers": [
-                    {
-                        "id": 19,
-                        "question_id": 4,
-                        "answer_text": "Chick Flicks",
-                        "point_value": 33,
-                        "currently_displayed": true
-                    },
-                    {
-                        "id": 20,
-                        "question_id": 4,
-                        "answer_text": "Shopping",
-                        "point_value": 18,
-                        "currently_displayed": false
-                    },
-                    {
-                        "id": 21,
-                        "question_id": 4,
-                        "answer_text": "Arts",
-                        "point_value": 12,
-                        "currently_displayed": false
-                    },
-                    {
-                        "id": 22,
-                        "question_id": 4,
-                        "answer_text": "Talking",
-                        "point_value": 11,
-                        "currently_displayed": true
-                    },
-                    {
-                        "id": 24,
-                        "question_id": 4,
-                        "answer_text": "Kids",
-                        "point_value": 3,
-                        "currently_displayed": false
-                    },
-                    {
-                        "id": 23,
-                        "question_id": 4,
-                        "answer_text": "Cooking",
-                        "point_value": 3,
-                        "currently_displayed": false
-                    }
-                ],
-                "show_single_x": false,
-                "show_total_wrong": true,
-                "no_active_game": false
+            websocketJson: {display_logo: true
             },
         },
         methods: {
             receiveMessage: function (e) {
                 var data = JSON.parse(e.data);
-                this.websocketJson = data;
+                this.websocketJson = data.state;
             }
         },
         computed: {
             sortedAnswers: function() {
+                if(typeof this.websocketJson.current_answers !== "undefined"){
                 return this.websocketJson.current_answers.sort((a,b) => (a.point_value > b.point_value) ? -1 : 1 )
-
+                }
             }
         }
     })
