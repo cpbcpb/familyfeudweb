@@ -12,7 +12,7 @@
 <body>
 <div id="app">
 [[state]]
-    <div class="logo-oval" v-show="state.display_logo">
+    <div class="logo-oval"v-show="state.display_logo">
         <div class="logo-text-box" >
             <div>
                 <span class="first-letter" data-text="C">C</span>
@@ -25,83 +25,84 @@
             </div>
         </div>
     </div>
-    <div class="score-top" v-if="!state.display_logo">
+    <div id="score-top" class="score" v-if="!state.display_logo">
         [[state.question_total]]
     </div>
-        <div class="score-left" v-if="!state.display_logo">
-        [[state.team_1_score]]
-    </div>
-     <div class="score-right" v-if="!state.display_logo">
-        [[state.team_2_score]]
-    </div>
-    <div class="game-grid" v-if="!state.display_logo">
-        <div class="game-column container">
-            <div class="answer-box row" v-if="sortedAnswers[0]">
-                <div class="number" v-show="!sortedAnswers[0].currently_displayed">1</div>
-                <div class="answer-text col-10" v-show="sortedAnswers[0].currently_displayed">[[sortedAnswers[0].answer_text]]</div>
-                <div class="answer-points col-2" v-show="sortedAnswers[0].currently_displayed">[[sortedAnswers[0].point_value]]</div>
-            </div>
-            <div v-else  class="answer-box row">
-            </div>
-            <div class="answer-box row" v-if="sortedAnswers[1]">
-                <div class="number" v-show="!sortedAnswers[1].currently_displayed">2</div>
-                <div class="answer-text col-10" v-show="sortedAnswers[1].currently_displayed">[[sortedAnswers[1].answer_text]]</div>
-                <div class="answer-points col-2" v-show="sortedAnswers[1].currently_displayed">[[sortedAnswers[1].point_value]]</div>
-            </div>
-            <div v-else  class="answer-box row">
-            </div>
-            <div class="answer-box row" v-if="sortedAnswers[2]">
-                <div class="number" v-show="!sortedAnswers[2].currently_displayed">3</div>
-                <div class="answer-text col-10" v-show="sortedAnswers[2].currently_displayed">[[sortedAnswers[2].answer_text]]</div>
-                <div class="answer-points col-2" v-show="sortedAnswers[2].currently_displayed">[[sortedAnswers[2].point_value]]</div>
-            </div>
-            <div v-else  class="answer-box row">
-            </div>
-            <div class="answer-box row" v-if="sortedAnswers[3]">
-                <div class="number" v-show="!sortedAnswers[3].currently_displayed">4</div>
-                <div class="answer-text col-10" v-show="sortedAnswers[3].currently_displayed">[[sortedAnswers[3].answer_text]]</div>
-                <div class="answer-points col-2" v-show="sortedAnswers[3].currently_displayed">[[sortedAnswers[3].point_value]]</div>
-            </div>
-            <div v-else  class="answer-box row">
-            </div>
+    <div id="scores-and-board">
+        <div id="score-left" class="score float-left" v-if="!state.display_logo">
+            [[state.team_1_score]]
         </div>
-        <div class="game-column container">
-            <div class="answer-box row" v-if="sortedAnswers[4]">
-                <div class="number" v-show="!sortedAnswers[4].currently_displayed">5</div>
-                <div class="answer-text col-10" v-show="sortedAnswers[4].currently_displayed">[[sortedAnswers[4].answer_text]]</div>
-                <div class="answer-points col-2" v-show="sortedAnswers[4].currently_displayed">[[sortedAnswers[4].point_value]]</div>
+        <div class="game-grid" v-if="!state.display_logo">
+            <div class="game-column container">
+                <div class="answer-box row" v-if="sortedAnswers[0]">
+                    <div class="number" v-show="!sortedAnswers[0].currently_displayed">1</div>
+                    <div class="answer-text col-10" v-show="sortedAnswers[0].currently_displayed">[[sortedAnswers[0].answer_text]]</div>
+                    <div class="answer-points col-2" v-show="sortedAnswers[0].currently_displayed">[[sortedAnswers[0].point_value]]</div>
+                </div>
+                <div v-else  class="answer-box row">
+                </div>
+                <div class="answer-box row" v-if="sortedAnswers[1]">
+                    <div class="number" v-show="!sortedAnswers[1].currently_displayed">2</div>
+                    <div class="answer-text col-10" v-show="sortedAnswers[1].currently_displayed">[[sortedAnswers[1].answer_text]]</div>
+                    <div class="answer-points col-2" v-show="sortedAnswers[1].currently_displayed">[[sortedAnswers[1].point_value]]</div>
+                </div>
+                <div v-else  class="answer-box row">
+                </div>
+                <div class="answer-box row" v-if="sortedAnswers[2]">
+                    <div class="number" v-show="!sortedAnswers[2].currently_displayed">3</div>
+                    <div class="answer-text col-10" v-show="sortedAnswers[2].currently_displayed">[[sortedAnswers[2].answer_text]]</div>
+                    <div class="answer-points col-2" v-show="sortedAnswers[2].currently_displayed">[[sortedAnswers[2].point_value]]</div>
+                </div>
+                <div v-else  class="answer-box row">
+                </div>
+                <div class="answer-box row" v-if="sortedAnswers[3]">
+                    <div class="number" v-show="!sortedAnswers[3].currently_displayed">4</div>
+                    <div class="answer-text col-10" v-show="sortedAnswers[3].currently_displayed">[[sortedAnswers[3].answer_text]]</div>
+                    <div class="answer-points col-2" v-show="sortedAnswers[3].currently_displayed">[[sortedAnswers[3].point_value]]</div>
+                </div>
+                <div v-else  class="answer-box row">
+                </div>
             </div>
-            <div v-else  class="answer-box row">
+            <div class="game-column container">
+                <div class="answer-box row" v-if="sortedAnswers[4]">
+                    <div class="number" v-show="!sortedAnswers[4].currently_displayed">5</div>
+                    <div class="answer-text col-10" v-show="sortedAnswers[4].currently_displayed">[[sortedAnswers[4].answer_text]]</div>
+                    <div class="answer-points col-2" v-show="sortedAnswers[4].currently_displayed">[[sortedAnswers[4].point_value]]</div>
+                </div>
+                <div v-else  class="answer-box row">
+                </div>
+                <div class="answer-box row" v-if="sortedAnswers[5]">
+                    <div class="number" v-show="!sortedAnswers[5].currently_displayed">6</div>
+                    <div class="answer-text col-10" v-show="sortedAnswers[5].currently_displayed">[[sortedAnswers[5].answer_text]]</div>
+                    <div class="answer-points col-2" v-show="sortedAnswers[5].currently_displayed">[[sortedAnswers[5].point_value]]</div>
+                </div>
+                <div v-else  class="answer-box row">
+                </div>
+                <div class="answer-box row" v-if="sortedAnswers[6]">
+                    <div class="number" v-show="!sortedAnswers[6].currently_displayed">7</div>
+                    <div class="answer-text col-10" v-show="sortedAnswers[6].currently_displayed">[[sortedAnswers[6].answer_text]]</div>
+                    <div class="answer-points col-2" v-show="sortedAnswers[6].currently_displayed">[[sortedAnswers[6].point_value]]</div>
+                </div>
+                <div v-else  class="answer-box row">
+                </div>
+                <div class="answer-box row" v-if="sortedAnswers[7]">
+                    <div class="number" v-show="!sortedAnswers[7].currently_displayed">8</div>
+                    <div class="answer-text col-10" v-show="sortedAnswers[7].currently_displayed">[[sortedAnswers[7].answer_text]]</div>
+                    <div class="answer-points col-2" v-show="sortedAnswers[7].currently_displayed">[[sortedAnswers[7].point_value]]</div>
+                </div>
+                <div v-else  class="answer-box row">
+                </div>
             </div>
-            <div class="answer-box row" v-if="sortedAnswers[5]">
-                <div class="number" v-show="!sortedAnswers[5].currently_displayed">6</div>
-                <div class="answer-text col-10" v-show="sortedAnswers[5].currently_displayed">[[sortedAnswers[5].answer_text]]</div>
-                <div class="answer-points col-2" v-show="sortedAnswers[5].currently_displayed">[[sortedAnswers[5].point_value]]</div>
-            </div>
-            <div v-else  class="answer-box row">
-            </div>
-            <div class="answer-box row" v-if="sortedAnswers[6]">
-                <div class="number" v-show="!sortedAnswers[6].currently_displayed">7</div>
-                <div class="answer-text col-10" v-show="sortedAnswers[6].currently_displayed">[[sortedAnswers[6].answer_text]]</div>
-                <div class="answer-points col-2" v-show="sortedAnswers[6].currently_displayed">[[sortedAnswers[6].point_value]]</div>
-            </div>
-            <div v-else  class="answer-box row">
-            </div>
-            <div class="answer-box row" v-if="sortedAnswers[7]">
-                <div class="number" v-show="!sortedAnswers[7].currently_displayed">8</div>
-                <div class="answer-text col-10" v-show="sortedAnswers[7].currently_displayed">[[sortedAnswers[7].answer_text]]</div>
-                <div class="answer-points col-2" v-show="sortedAnswers[7].currently_displayed">[[sortedAnswers[7].point_value]]</div>
-            </div>
-            <div v-else  class="answer-box row">
-            </div>
+            <strikes 
+                v-bind:show_total_wrong="state.show_total_wrong" 
+                v-bind:total_wrong="state.total_wrong" 
+                v-bind:show_single_x="state.show_single_x">
+            </strikes>
         </div>
-        <strikes 
-            v-bind:show_total_wrong="state.show_total_wrong" 
-            v-bind:total_wrong="state.total_wrong" 
-            v-bind:show_single_x="state.show_single_x">
-        </strikes>
+        <div  id="score-right" class="score" v-if="!state.display_logo">
+            [[state.team_2_score]]
+        </div>
     </div>
-
 </div>
 </body>
 
@@ -230,7 +231,6 @@
   position:relative;
   line-height: .75em;
 }
-
 .logo-text-box div span::after {
     display: inline-block;
   content: attr(data-text);
@@ -250,6 +250,27 @@
     vertical-align: 10px;
     line-height: 1.3em !important;
 }
+
+#scores-and-board {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+.score {
+    border-style: solid;
+}
+#score-top {
+
+}
+#score-left {
+    float: left;
+}
+#score-right {
+    float: right;
+}
+
+
 .game-grid {
     display: flex;
     flex-direction: row;
