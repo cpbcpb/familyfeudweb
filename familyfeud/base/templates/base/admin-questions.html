@@ -1,191 +1,188 @@
 <!DOCTYPE html>
 <html lang="en">
+{% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <title>Button</title>
+    <title>Admin Dash</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'base/styles.css' %}"></link>
 </head>
-<style>
-    td {
-        border: 1px solid black;
-    }
-
-    .answer-group {
-        background-color: black !important;
-    }
-
-    .half-row {
-        min-width: 50%;
-    }
-
-    .answers-table {
-        width: 800px;
-        text-align: left;
-        margin: 20px auto;
-    }
-
-    .answer-text {
-        width: 45%;
-    }
-
-    .answer-value {
-        width: 5%;
-        text-align: center;
-    }
-    td {
-        height: 25px;
-    }
-    .answer-text p {
-        display: inline;
-    }
-
-    .newGameSection {
-        border: 3px solid black;
-        border-radius:5px;
-        display: inline-block;
-        text-align: center;
-        margin: 0 auto;
-        padding: 15px;
-    }
-    .newGameSectionWrapper {
-        text-align: center
-    }
-
-    .controls {
-        padding: 30px;
-    }
-
-    .question-info {
-        text-align: center;
-        border: 3px solid black;
-        border-radius:5px;
-        padding: 10px 0;
-    }
-
-    .wrong-count {
-        color: red;
-        font-size: 50px;
-    }
-
-    .wrong-placeholder {
-        color: black;
-    }
-
-    .scores {
-        text-align: center;
-    }
-
-    .scores h3 {
-        font-weight: bold;
-        text-decoration: underline;
-    }
-
-    .edit-scores {
-        text-align: left;
-        margin: 5px auto;
-        display: inline-block;
-        padding: 10px;
-        border: 1.5px solid black;
-    }
-    
-    .wrong {
-        margin-right: 10px;
-    }
-
-    .edit-wrong {
-        margin: 5px auto;
-        display: inline-block;
-        padding: 10px;
-        border: 1.5px solid black;
-    }
-    
-    .edit-wrong button {
-        margin-bottom: 5px;
-    }
-</style>
 <body>
     <div id="app">
         <div class="newGameSectionWrapper">
             <div class="newGameSection">
-                <h2>Start a new game!</h2>
+                <h2>Start New Game</h2>
                 <select class="form-control" v-model="gameToStart">
                     <option value="0" disabled>SELECT A QUESTION SET</option>
                     <option v-for="question_set in question_sets" v-bind:value="question_set.id">[[question_set.friendly_name]]</option>
                 </select><br>
-                <button class="btn btn-primary" v-on:click="createNewGame(gameToStart)">Start New Game!</button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmNewGame">
+                Start New Game
+                </button>
+
+                <!-- Confimation Modal-->
+                <div class="modal fade" id="confirmNewGame" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Are you sure you want to start a new game?</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                Starting a new game will reset ALL data regarding the current game including team scores.
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <button type="button" v-on:click="createNewGame(gameToStart)"  data-dismiss="modal" class="btn btn-primary">Start New Game</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
         <div class="controls" v-if="!state.no_active_game">
-            <div class="scores">
-                <h3>Scores</h3>
-                <h4>Team 1: [[ state.team_1_score ]]</h4>
-                <h4>Team 2: [[ state.team_2_score ]]</h4>
-                <button v-on:click="revealEditScore" class="btn btn-primary">Manually Edit Scores</button><br>
-                <div v-if="showEditScore" class="edit-scores">
-                    <label for="team_1_score">Team 1: </label><input class="form-control-inline" type="number" v-model="editTeam1"><br>
-                    <label for="team_2_score">Team 2: </label><input class="form-control-inline" type="number" v-model="editTeam2"><br>
-                    <button v-on:click="submitEditScore" class="btn btn-success">Update</button>
-                    <button v-on:click="showEditScore = false" class="btn btn-danger">Cancel</button>
+            <div v-if="!state.is_fast_money" class="normalRound">
+                <div class="scores">
+                    <h3>Scores</h3>
+                    <h4>Team 1: [[ state.team_1_score ]]</h4>
+                    <h4>Team 2: [[ state.team_2_score ]]</h4>
+                    <button v-on:click="revealEditScore" class="btn btn-primary">Manually Edit Scores</button><br>
+                    <div v-if="showEditScore" class="edit-scores">
+                        <label for="team_1_score">Team 1: </label><input class="form-control-inline" type="number" v-model="editTeam1"><br>
+                        <label for="team_2_score">Team 2: </label><input class="form-control-inline" type="number" v-model="editTeam2"><br>
+                        <button v-on:click="submitEditScore" class="btn btn-success">Update</button>
+                        <button v-on:click="showEditScore = false" class="btn btn-danger">Cancel</button>
+                    </div>
+                </div>
+                <div class="question-info">
+                    <button v-on:click="revealBoard" v-if="state.display_logo" class="btn btn-success"> Reveal Board! </button>
+                    <button v-on:click="hideBoard" v-if="!state.display_logo" class="btn btn-danger"> Hide Board </button>
+                    <h3>Current Question: [[state.current_question.question_text]]</h3>
+                    <h4>Total: [[state.question_total]]</h4>
+                    <button v-on:click="awardPoints('one')" class="btn btn-primary">Award Team 1 Points</button>
+                    <button v-on:click="awardPoints('two')" class="btn btn-primary">Award Team 2 Points</button>
+                    <table class='answers-table'>
+                        <tr v-for="(answer, index) in state.current_answers.slice(0,4)">
+                            <td class="answer-text">
+                                <p>[[ getAnswerInfo(index, 'answer_text') ]]</p>
+                                <button class="btn btn-success" v-if="!getAnswerInfo(index, 'currently_displayed')" v-on:click="displayAnswer(getAnswerInfo(index, 'id'))">Display it!</button>
+                                <button class="btn btn-danger" v-if="getAnswerInfo(index, 'currently_displayed')" v-on:click="hideAnswer(getAnswerInfo(index, 'id'))">Hide It!</button>
+                            </td>
+                            <td class="answer-value">
+                                <p>[[ getAnswerInfo(index, 'point_value')]]</p>
+                            </td>
+                            <td class="answer-text">
+                                <p>[[ getAnswerInfo(index+4, 'answer_text') ]]</p>
+                                <button class="btn btn-success" v-if="!getAnswerInfo(index+4, 'currently_displayed') && getAnswerInfo(index+4, 'currently_displayed') !== ''" v-on:click="displayAnswer(getAnswerInfo(index+4, 'id'))">Display it!</button>
+                                <button class="btn btn-danger" v-if="getAnswerInfo(index+4, 'currently_displayed')" v-on:click="hideAnswer(getAnswerInfo(index+4, 'id'))">Hide It!</button>
+                            </td>
+                            <td class="answer-value">
+                                <p>[[ getAnswerInfo(index+4, 'point_value') ]]</p>
+                            </td>
+                        </tr>
+                    </table>
+                    <button class="btn btn-danger wrong" v-on:click="addWrongAnswer">WRONG ANSWER</button>
+                    <button class="btn btn-primary" v-on:click="showSingleX">Show Single X</button>
+                    <br>
+                    <b class="wrong-count" v-for="n in state.total_wrong">X </b>
+                    <b class="wrong-count wrong-placeholder" v-for="n in 3 - state.total_wrong"> _</b>
+                    <br>
+                    <button v-on:click="revealEditWrong" class="btn btn-primary">Manually Edit Total Wrong</button><br>
+                    <div v-if="showEditWrong" class="edit-wrong">
+                        <select class="form-control" v-model="editTotalWrong">
+                            <option v-for="n in 4" :value="n-1">[[n-1]]</option>
+                        </select>
+                        <br>
+                        <button v-on:click="submitEditWrong('1')" class="btn btn-primary">Update and Buzz</button>
+                        <button v-on:click="submitEditWrong('0')" class="btn btn-success">Update Silently</button>
+                        <br>
+                        <button v-on:click="showEditWrong = false" class="btn btn-danger">Cancel</button>
+                    </div>
+                    <br>
+                    <button v-if="state.current_question.id != state.last_question.id" v-on:click="nextQuestion" class="btn btn-primary">Go to the Next Question!</button>
+                    <p v-if="state.current_question.id == state.last_question.id"><b>Last Question Reached. Start Fast Money Next.</b></p>
                 </div>
             </div>
-            <div class="question-info">
+            <div class="center-container">
+                <br>
+                <button v-if="!state.is_fast_money" v-on:click="toggleFastMoney('1')" class="btn btn-primary">Start Fast Money</button>
+                <button v-if="state.is_fast_money" v-on:click="toggleFastMoney('0')" class="btn btn-primary">Go back to the Normal Rounds</button>
+            </div>
+            <div class="fast-money" v-if="state.is_fast_money">
+                <h2>Fast Money</h2>
                 <button v-on:click="revealBoard" v-if="state.display_logo" class="btn btn-success"> Reveal Board! </button>
                 <button v-on:click="hideBoard" v-if="!state.display_logo" class="btn btn-danger"> Hide Board </button>
-                <h3>Current Question: [[state.current_question.question_text]]</h3>
-                <h4>Total: [[state.question_total]]</h4>
-                <button v-on:click="awardPoints('one')" class="btn btn-primary">Award Team 1 Points</button>
-                <button v-on:click="awardPoints('two')" class="btn btn-primary">Award Team 2 Points</button>
-                <table class='answers-table'>
-                    <tr v-for="(answer, index) in state.current_answers.slice(0,4)">
-                        <td class="answer-text">
-                            <p>[[ getAnswerInfo(index, 'answer_text') ]]</p>
-                            <button class="btn btn-success" v-if="!getAnswerInfo(index, 'currently_displayed')" v-on:click="displayAnswer(getAnswerInfo(index, 'id'))">Display it!</button>
-                            <button class="btn btn-danger" v-if="getAnswerInfo(index, 'currently_displayed')" v-on:click="hideAnswer(getAnswerInfo(index, 'id'))">Hide It!</button>
-                        </td>
-                        <td class="answer-value">
-                            <p>[[ getAnswerInfo(index, 'point_value')]]</p>
-                        </td>
-                        <td class="answer-text">
-                            <p>[[ getAnswerInfo(index+4, 'answer_text') ]]</p>
-                            <button class="btn btn-success" v-if="!getAnswerInfo(index+4, 'currently_displayed') && getAnswerInfo(index+4, 'currently_displayed') !== ''" v-on:click="displayAnswer(getAnswerInfo(index+4, 'id'))">Display it!</button>
-                            <button class="btn btn-danger" v-if="getAnswerInfo(index+4, 'currently_displayed')" v-on:click="hideAnswer(getAnswerInfo(index+4, 'id'))">Hide It!</button>
-                        </td>
-                        <td class="answer-value">
-                            <p>[[ getAnswerInfo(index+4, 'point_value') ]]</p>
-                        </td>
-                    </tr>
-                </table>
-                <button class="btn btn-danger wrong" v-on:click="addWrongAnswer">WRONG ANSWER</button>
-                <button class="btn btn-primary" v-on:click="showSingleX">Show Single X</button>
                 <br>
-                <b class="wrong-count" v-for="n in state.total_wrong">X </b>
-                <b class="wrong-count wrong-placeholder" v-for="n in 3 - state.total_wrong"> _</b>
+                <h5>Timer</h5>
+                <input type="number" v-model="state.fast_money.timer">
+                <button v-on:click="setTimer" class="btn btn-primary">Set Timer</button>
+                <button v-on:click="toggleTimer('1')" class="btn btn-success">Start Timer</button>
+                <button v-on:click="toggleTimer('0')" class="btn btn-danger">Stop Timer</button>
                 <br>
-                <button v-on:click="revealEditWrong" class="btn btn-primary">Manually Edit Total Wrong</button><br>
-                <div v-if="showEditWrong" class="edit-wrong">
-                    <select class="form-control" v-model="editTotalWrong">
-                        <option v-for="n in 4" :value="n-1">[[n-1]]</option>
-                    </select>
-                    <br>
-                    <button v-on:click="submitEditWrong('1')" class="btn btn-primary">Update and Buzz</button>
-                    <button v-on:click="submitEditWrong('0')" class="btn btn-success">Update Silently</button>
-                    <br>
-                    <button v-on:click="showEditWrong = false" class="btn btn-danger">Cancel</button>
+                <div class="center-container">
+                    <h5>Player 1</h5>
+                    <table>
+                        <tr v-for="question in state.fast_money.questions">
+                            <td class="fm-question">[[question.text]]</td>
+                            <td class="fm-input"><input type="text" v-model="question['player_1_answer'].answer_text" v-on:blur="updateFastMoneyAnswer(question.id, 1, $event)"></td>
+                            <td class="fm-select">
+                                <select name="" v-on:change="assignPointValue(question.id, 1, $event)" id="">
+                                    <option value="" disabled selected>Select an answer</option>
+                                    <option  v-for="answer in fastMoneyAnswers[question.id]" :value="answer.id">[[answer.answer_text]] - [[answer.point_value]]</option>
+                                    <option value="0">Incorrect - 0</option>
+                                </select>
+                            </td>
+                            <td>
+                                <button v-if="!question['player_1_answer'].display_answer" v-on:click="toggleFastMoneyAnswer(question.id, 1, '1')" class="btn btn-success">Display User Answer</button>
+                                <button v-if="question['player_1_answer'].display_answer" v-on:click="toggleFastMoneyAnswer(question.id, 1, '0')" class="btn btn-danger">Hide User Answer</button><br>
+                                <button v-if="!question['player_1_answer'].display_value" v-on:click="toggleFastMoneyValue(question.id, 1, '1')" class="btn btn-success">Display Point Value</button>
+                                <button v-if="question['player_1_answer'].display_value" v-on:click="toggleFastMoneyValue(question.id, 1, '0')" class="btn btn-danger">Hide Point Value</button>
+                            </td>
+                        </tr>                                                                                            
+                    </table>
+                    <br><br>
+                    <h5>Player 2</h5>
+                    <table>
+                        <tr v-for="question in state.fast_money.questions">
+                            <td class="fm-question">[[question.text]]</td>
+                            <td class="fm-input"><input type="text" v-model="question['player_2_answer'].answer_text" v-on:blur="updateFastMoneyAnswer(question.id, 2, $event)"></td>
+                            <td class="fm-select">
+                                <select name="" v-on:change="assignPointValue(question.id, 2, $event)" id="">
+                                    <option value="" disabled selected>Select an answer</option>
+                                    <option  v-for="answer in fastMoneyAnswers[question.id]" :value="answer.id">[[answer.answer_text]] - [[answer.point_value]]</option>
+                                    <option value="0">Incorrect - 0</option>
+                                </select>
+                            </td>
+                            <td>
+                                <button v-if="!question['player_2_answer'].display_answer" v-on:click="toggleFastMoneyAnswer(question.id, 2, '1')" class="btn btn-success">Display User Answer</button>
+                                <button v-if="question['player_2_answer'].display_answer" v-on:click="toggleFastMoneyAnswer(question.id, 2, '0')" class="btn btn-danger">Hide User Answer</button><br>
+                                <button v-if="!question['player_2_answer'].display_value" v-on:click="toggleFastMoneyValue(question.id, 2, '1')" class="btn btn-success">Display Point Value</button>
+                                <button v-if="question['player_2_answer'].display_value" v-on:click="toggleFastMoneyValue(question.id, 2, '0')" class="btn btn-danger">Hide Point Value</button>
+                            </td>
+                        </tr>                                                                                            
+                    </table>
                 </div>
             </div>
-            <button v-on:click="nextQuestion" class="btn btn-primary">Go to the Next Question!</button>
         </div>
     </div>
+</div>
 </body>
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="{% static 'base/vue.js' %}"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <script>
     axios.defaults.xsrfCookieName = 'csrftoken'
     axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
     question_set_list = {{question_sets}}
     state = {{state}}
+    fast_money_answers = {{fast_money_answers}}
 
     if (!state.no_active_game) {
         state.current_answers.sort(function (a, b) { return (a.point_value < b.point_value) ? 1 : -1}) // We sort the answers by score value so that the highest value is first,
@@ -199,11 +196,15 @@
             question_sets: question_set_list,
             state: state,
             gameToStart: 0,
+            fastMoneyAnswers: fast_money_answers,
             showEditScore: false,
             editTeam1: 0,
             editTeam2: 0,
             showEditWrong: false,
-            editTotalWrong: 0
+            editTotalWrong: 0,
+            player1Answers:{},
+            player2Answers:{},
+            isLastQuestion: false
         },
         methods: {
             displayAnswer: function(answerId) {
@@ -356,7 +357,109 @@
                     }
                 })
                 this.showEditWrong = false;
-            }
+            },
+            updateFastMoneyAnswer: function(question, player, inputEvent) {
+                answer = inputEvent.target.value;
+                var formData = new FormData();
+                formData.set('answer', answer);
+                formData.set('question', question);
+                formData.set('player', player);
+                axios({
+                    method: 'post',
+                    url: '/base/admin/answerFastMoney/',
+                    data: formData
+                }).then(function (response) {
+                    if (response['data']['isSuccessful']) {
+                        app.state = response['data']['state']
+                    }
+                })
+            },
+            assignPointValue: function(question, player, event) {
+                answer = event.target.value;
+                var formData = new FormData();
+                formData.set('answer_id', answer);
+                formData.set('question', question);
+                formData.set('player', player);
+                axios({
+                    method: 'post',
+                    url: '/base/admin/assignPointValue/',
+                    data: formData
+                }).then(function (response) {
+                    if (response['data']['isSuccessful']) {
+                        app.state = response['data']['state']
+                    }
+                })
+            },
+            toggleFastMoneyAnswer: function(question_id, player,displayIt) {
+                var formData = new FormData();
+                formData.set('question', question_id);
+                formData.set('displayIt', displayIt)
+                formData.set('player', player);
+                axios({
+                    method: 'post',
+                    url: '/base/admin/toggleFastMoneyAnswer/',
+                    data: formData
+                }).then(function (response) {
+                    if (response['data']['isSuccessful']) {
+                        app.state = response['data']['state']
+                    }
+                })
+            },
+            toggleFastMoneyValue: function(question_id, player, displayIt) {
+                var formData = new FormData();
+                formData.set('question', question_id);
+                formData.set('displayIt', displayIt)
+                formData.set('player', player);
+                axios({
+                    method: 'post',
+                    url: '/base/admin/toggleFastMoneyValue/',
+                    data: formData
+                }).then(function (response) {
+                    if (response['data']['isSuccessful']) {
+                        app.state = response['data']['state']
+                    }
+                })
+            },
+            toggleTimer: function(startTimer) {
+                var formData = new FormData();
+                formData.set('startTimer', startTimer)
+                axios({
+                    method: 'post',
+                    url: '/base/admin/toggleTimer/',
+                    data: formData
+                }).then(function (response) {
+                    if (response['data']['isSuccessful']) {
+                        app.state = response['data']['state']
+                    }
+                })
+            },
+            setTimer: function() {
+                var formData = new FormData();
+                formData.set('timer', state.fast_money.timer);
+                axios({
+                    method: 'post',
+                    url: '/base/admin/setTimer/',
+                    data: formData
+                }).then(function (response) {
+                    if (response['data']['isSuccessful']) {
+                        app.state = response['data']['state']
+                    }
+                })
+            },
+            toggleFastMoney: function(startFastMoney) {
+                var formData = new FormData();
+                formData.set('startFastMoney', startFastMoney);
+                axios({
+                    method: 'post',
+                    url: '/base/admin/toggleFastMoney/',
+                    data: formData
+                }).then(function (response) {
+                    if (response['data']['isSuccessful']) {
+                        app.state = response['data']['state']
+                    }
+                })
+            },
+
         }
     })
 </script>

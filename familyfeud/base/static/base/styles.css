@@ -1,0 +1,118 @@
+td {
+    border: 1px solid black;
+}
+
+.answer-group {
+    background-color: black !important;
+}
+
+.half-row {
+    min-width: 50%;
+}
+
+.answers-table {
+    width: 800px;
+    text-align: left;
+    margin: 20px auto;
+}
+
+.answer-text {
+    width: 45%;
+}
+
+.answer-value {
+    width: 5%;
+    text-align: center;
+}
+td {
+    height: 25px;
+}
+.answer-text p {
+    display: inline;
+}
+
+.newGameSection {
+    border: 3px solid black;
+    border-radius:5px;
+    display: inline-block;
+    text-align: center;
+    margin: 0 auto;
+    padding: 15px;
+}
+.newGameSectionWrapper {
+    text-align: center
+}
+
+.controls {
+    padding: 30px;
+}
+
+.question-info {
+    text-align: center;
+    border: 3px solid black;
+    border-radius:5px;
+    padding: 10px 0;
+}
+
+.wrong-count {
+    color: red;
+    font-size: 50px;
+}
+
+.wrong-placeholder {
+    color: black;
+}
+
+.scores {
+    text-align: center;
+}
+
+.scores h3 {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.edit-scores {
+    text-align: left;
+    margin: 5px auto;
+    display: inline-block;
+    padding: 10px;
+    border: 1.5px solid black;
+}
+
+.wrong {
+    margin-right: 10px;
+}
+
+.edit-wrong {
+    margin: 5px auto;
+    display: inline-block;
+    padding: 10px;
+    border: 1.5px solid black;
+}
+
+.edit-wrong button {
+    margin-bottom: 5px;
+}
+
+.fast-money {
+    text-align: center;
+}
+
+.center-container {
+    text-align: center;
+}
+.center-container table {
+    margin: 0 auto;
+}
+.center-container table tr td {
+    text-align: left;
+}
+
+.fm-select select {
+    width: 100%;
+}
+
+.fast-money-player {
+    width: 50%;
+}

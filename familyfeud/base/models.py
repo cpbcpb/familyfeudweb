@@ -12,7 +12,7 @@ class Question(models.Model):
     question_text = models.CharField(max_length=500)
     game = models.ForeignKey(QuestionSet, on_delete=models.CASCADE)
     question_order = models.IntegerField(default=0)
-
+    is_fast_money = models.BooleanField(default=False)
     def __str__(self):
         return self.question_text
 
@@ -34,3 +34,18 @@ class GameStatus(models.Model):
     display_logo = models.BooleanField(default=True)
     create_date = models.DateTimeField(default=now)
     displayed_answers = models.ManyToManyField(Answer, blank=True)
+    is_fast_money = models.BooleanField(default=False)
+    player_1_score = models.IntegerField(default=0)
+    player_2_score = models.IntegerField(default=0)
+    timer = models.IntegerField(default=20)
+    last_question = models.ForeignKey(Question, related_name='last_question', on_delete=models.CASCADE, null=True, blank=True)
+
+
+class FastMoneyAnswer(models.Model):
+    game_status = models.ForeignKey(GameStatus, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    answer_text = models.CharField(default='', max_length=500)
+    point_value = models.IntegerField(default=0)
+    display_answer = models.BooleanField(default=False)
+    display_value = models.BooleanField(default=False)
+    player = models.IntegerField(default=0)
