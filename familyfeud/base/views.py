@@ -11,6 +11,16 @@ from django.forms.models import model_to_dict
 
 import json
 
+
+def game(request):
+    game_state = get_current_game_state_as_dict()
+
+    return render(request, 'base/game_board.html', {
+        'state': mark_safe(json.dumps(game_state))
+    })
+
+
+
 def getCurrentGameStatus():
     if len(GameStatus.objects.filter().order_by('-create_date')) == 0:
         return {}
