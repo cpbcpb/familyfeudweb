@@ -46,6 +46,7 @@ class FastMoneyAnswer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     answer_text = models.CharField(default='', max_length=500)
     point_value = models.IntegerField(default=0)
+    answer_id = models.IntegerField(default=0) # We're using an int field instead of Foreign key because this is only used for the Admin Dropdown and may be zero (for incorrect).
     display_answer = models.BooleanField(default=False)
     display_value = models.BooleanField(default=False)
     player = models.IntegerField(default=0)

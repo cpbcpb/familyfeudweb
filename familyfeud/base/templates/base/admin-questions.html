@@ -118,20 +118,20 @@
                 <button v-on:click="revealBoard" v-if="state.display_logo" class="btn btn-success"> Reveal Board! </button>
                 <button v-on:click="hideBoard" v-if="!state.display_logo" class="btn btn-danger"> Hide Board </button>
                 <br>
-                <h5>Timer</h5>
-                <input type="number" v-model="state.fast_money.timer">
+                <h3>Timer</h3>
+                <input type="number" v-model="state.fast_money.timer"><br><br>
                 <button v-on:click="setTimer" class="btn btn-primary">Set Timer</button>
                 <button v-on:click="toggleTimer('1')" class="btn btn-success">Start Timer</button>
                 <button v-on:click="toggleTimer('0')" class="btn btn-danger">Stop Timer</button>
                 <br>
                 <div class="center-container">
-                    <h5>Player 1</h5>
+                    <h4>Player 1</h4>
                     <table>
                         <tr v-for="question in state.fast_money.questions">
                             <td class="fm-question">[[question.text]]</td>
                             <td class="fm-input"><input type="text" v-model="question['player_1_answer'].answer_text" v-on:blur="updateFastMoneyAnswer(question.id, 1, $event)"></td>
                             <td class="fm-select">
-                                <select name="" v-on:change="assignPointValue(question.id, 1, $event)" id="">
+                                <select name="" v-on:change="assignPointValue(question.id, 1, $event)" id="" v-model="question['player_1_answer'].answer_id">
                                     <option value="" disabled selected>Select an answer</option>
                                     <option  v-for="answer in fastMoneyAnswers[question.id]" :value="answer.id">[[answer.answer_text]] - [[answer.point_value]]</option>
                                     <option value="0">Incorrect - 0</option>
@@ -146,13 +146,13 @@
                         </tr>                                                                                            
                     </table>
                     <br><br>
-                    <h5>Player 2</h5>
+                    <h4>Player 2</h4>
                     <table>
                         <tr v-for="question in state.fast_money.questions">
                             <td class="fm-question">[[question.text]]</td>
                             <td class="fm-input"><input type="text" v-model="question['player_2_answer'].answer_text" v-on:blur="updateFastMoneyAnswer(question.id, 2, $event)"></td>
                             <td class="fm-select">
-                                <select name="" v-on:change="assignPointValue(question.id, 2, $event)" id="">
+                                <select name="" v-on:change="assignPointValue(question.id, 2, $event)"  v-model="question['player_2_answer'].answer_id" id="">
                                     <option value="" disabled selected>Select an answer</option>
                                     <option  v-for="answer in fastMoneyAnswers[question.id]" :value="answer.id">[[answer.answer_text]] - [[answer.point_value]]</option>
                                     <option value="0">Incorrect - 0</option>
@@ -216,7 +216,7 @@
                     data: formData
                 }).then(function (response) {
                     if (response['data']['isSuccessful']) {
-                        app.state = response['data']['state']
+                        app.state = response['data']['state'];
                     }
                 })
             },
@@ -338,20 +338,17 @@
             },
             revealEditWrong: function () {
                 this.editTotalWrong = this.state.total_wrong;
-                console.log(this.state.total_wrong)
                 this.showEditWrong = true;
             },
             submitEditWrong: function(showBuzzer) {
                 var formData = new FormData()
                 formData.set('totalWrong', this.editTotalWrong)
                 formData.set('showBuzzer', showBuzzer)
-                console.log(showBuzzer)
                 axios({
                     method: 'post',
                     url: '/base/admin/editTotalWrong/',
                     data: formData
                 }).then(function (response) {
-                    console.log(response)
                     if (response['data']['isSuccessful']) {
                         app.state = response['data']['state']
                     }
@@ -435,7 +432,7 @@
             },
             setTimer: function() {
                 var formData = new FormData();
-                formData.set('timer', state.fast_money.timer);
+                formData.set('timer', this.state.fast_money.timer);
                 axios({
                     method: 'post',
                     url: '/base/admin/setTimer/',
@@ -443,6 +440,7 @@
                 }).then(function (response) {
                     if (response['data']['isSuccessful']) {
                         app.state = response['data']['state']
+                        console.log(state)
                     }
                 })
             },

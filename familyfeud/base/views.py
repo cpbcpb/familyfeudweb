@@ -17,19 +17,7 @@ def getCurrentGameStatus():
     return GameStatus.objects.filter().order_by('-create_date')[0]
 
 def questions(request):
-    answers = [
-        {'id': 2, 'text': 'Bedroom', 'value': 17},
-        {'id': 1, 'text': 'Bathroom / Shower', 'value': 29},
-        {'id': 3, 'text': 'Doctor\'s Office / Hospital', 'value': 15},
-        {'id': 4, 'text': 'Nude Beach', 'value': 13},
-        {'id': 5, 'text': 'Dressing Room', 'value': 12},
-        {'id': 6, 'text': 'Gym', 'value': 9},
-        {'id': 7, 'text': 'Spa / Massage Joint', 'value': 5},
-        
-    ]
-    return render(request, 'base/questions.html', {
-        'answers': mark_safe(json.dumps(answers))
-    })
+    return render(request, 'base/questions.html')
 
 def adminquestions(request): 
     """ Display the admin dashboard """
@@ -347,7 +335,18 @@ def assignPointValue(request):
                 fast_money_answer.point_value = answer.point_value
             else:
                 fast_money_answer.point_value = 0
+            fast_money_answer.answer_id = answer_id
             fast_money_answer.save()
+            fast_money_answers = FastMoneyAnswer.objects.filter(Q(game_status=current_game_status) & Q(player=player))
+            player_total = 0
+            for answer in fast_money_answers:
+                player_total += answer.point_value
+            if int(player) == 1:
+                current_game_status.player_1_score = player_total
+            elif int(player) == 2:
+                current_game_status.player_2_score = player_total
+            current_game_status.save()
+
         except Exception as e:
             print(e)
             return JsonResponse({'isSuccessful': False})
