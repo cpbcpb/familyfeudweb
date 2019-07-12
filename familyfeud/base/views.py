@@ -1,19 +1,26 @@
 from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.utils.safestring import mark_safe
-from asgiref.sync import async_to_sync
 from django.db.models import Q
-from .models import Question, QuestionSet, Answer, GameStatus, FastMoneyAnswer
-from channels.layers import get_channel_layer
+from .models import Question, QuestionSet, Answer
 from django.views.decorators.csrf import csrf_exempt
-from django.forms.models import model_to_dict
-
-
+import base.data_handler as data_handler
 import json
+
+# Basic functions
+def setJsonResponse(data_response):
+    if data_response['isSuccessful']:
+        return JsonResponse({'isSuccessful': True, 'state': data_handler.get_current_game_state_as_dict()})
+    else:
+        if 'error' in data_response:
+            return JsonResponse({'isSuccessful': False, 'error_message': data_response['error']})
+        else:
+            return JsonResponse({'isSuccessful': False})
+
 
 
 def game(request):
-    game_state = get_current_game_state_as_dict()
+    game_state = data_handler.get_current_game_state_as_dict()
 
     return render(request, 'base/game_board.html', {
         'state': mark_safe(json.dumps(game_state))
@@ -25,27 +32,16 @@ def getCurrentGameStatus():
     if len(GameStatus.objects.filter().order_by('-create_date')) == 0:
         return {}
     return GameStatus.objects.filter().order_by('-create_date')[0]
+# Here we begin the actual views / routes
 
 def questions(request):
-    answers = [
-        {'id': 2, 'text': 'Bedroom', 'value': 17},
-        {'id': 1, 'text': 'Bathroom / Shower', 'value': 29},
-        {'id': 3, 'text': 'Doctor\'s Office / Hospital', 'value': 15},
-        {'id': 4, 'text': 'Nude Beach', 'value': 13},
-        {'id': 5, 'text': 'Dressing Room', 'value': 12},
-        {'id': 6, 'text': 'Gym', 'value': 9},
-        {'id': 7, 'text': 'Spa / Massage Joint', 'value': 5},
-        
-    ]
-    return render(request, 'base/questions.html', {
-        'answers': mark_safe(json.dumps(answers))
-    })
+    return render(request, 'base/questions.html')
 
 def adminquestions(request): 
     """ Display the admin dashboard """
     question_set_list = list(QuestionSet.objects.values())
-    game_state = get_current_game_state_as_dict()
-    current_game_status = getCurrentGameStatus()
+    game_state = data_handler.get_current_game_state_as_dict()
+    current_game_status = data_handler.getCurrentGameStatus()
     fast_money_answers = {}
     if not game_state['no_active_game']:
         fast_money_questions = list(Question.objects.filter(Q(game=current_game_status.current_game) & Q(is_fast_money=True)).values().order_by('question_order'))
@@ -58,217 +54,67 @@ def adminquestions(request):
         'fast_money_answers': mark_safe(json.dumps(fast_money_answers))
     })
 
-def send_current_game_state(game_state):
-    channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.group_send)(
-        'displayanswer_base',
-        {
-            'type': 'send_state',
-            'state': game_state
-        }
-    )
-
-def get_current_game_state_as_dict():
-    current_game_status = getCurrentGameStatus()
-    if current_game_status == {}:
-        return {
-            'team_1_score': 0,
-            'team_2_score': 0,
-            'question_total': 0,
-            'total_wrong': 0,
-            'current_game_id': 0,
-            'current_question_id': 0,
-            'current_question': {},
-            'create_date': '',
-            'display_logo': False,
-            'current_answers': [],
-            'show_single_x': False,
-            'show_total_wrong': False,
-            'no_active_game': True,
-        }
-    current_answers = list(Answer.objects.filter(question_id=current_game_status.current_question_id).order_by('-point_value').values())
-    displayed_answers = list(current_game_status.displayed_answers.values())
-
-    for answer in current_answers:
-        if answer in displayed_answers:
-            answer['currently_displayed'] = True
-        else:
-            answer['currently_displayed'] = False
-
-    fast_money_questions = Question.objects.filter(Q(game=current_game_status.current_game_id) & Q(is_fast_money=True))
-    questions = []
-    for question in fast_money_questions:
-        fast_money_question = {
-            'text': question.question_text,
-            'order': question.question_order,
-            'id': question.pk,
-            'player_1_answer': FastMoneyAnswer.objects.filter(Q(game_status=current_game_status) & Q(question=question) & Q(player=1)).values()[0],
-            'player_2_answer': FastMoneyAnswer.objects.filter(Q(game_status=current_game_status) & Q(question=question) & Q(player=2)).values()[0]
-        }
-        questions.append(fast_money_question)
-
-    return {
-        'team_1_score': current_game_status.team_1_score,
-        'team_2_score': current_game_status.team_2_score,
-        'question_total': current_game_status.question_total,
-        'total_wrong': current_game_status.question_total_wrong,
-        'current_game_id': current_game_status.current_game_id,
-        'current_question_id': current_game_status.current_question_id,
-        'current_question': model_to_dict(current_game_status.current_question),
-        'last_question': model_to_dict(current_game_status.last_question),
-        'create_date': current_game_status.create_date.__str__(),
-        'display_logo': current_game_status.display_logo,
-        'current_answers': current_answers,
-        'is_fast_money': current_game_status.is_fast_money,
-        'fast_money': {
-            'player_1_score': current_game_status.player_1_score,
-            'player_2_score': current_game_status.player_2_score,
-            'timer': current_game_status.timer,
-            'start_timer': False,
-            'stop_timer': False,
-            'questions': questions
-        },
-        'show_single_x': False,
-        'show_total_wrong': False,
-        'no_active_game': False,
-    
-    }
-
-def sumAnswerTotals(answers):
-    total = 0
-    for answer in answers:
-        total += answer['point_value']
-    return total
-
 @csrf_exempt
 def createNewGame(request):
     """ Creates a new 'GameStatus'. Supply the id of the 'game' you wish to use using 'game' as form data."""
     if request.method == 'POST':
-        try:
-            current_game = QuestionSet.objects.get(pk=request.POST['game'])
-            new_game_status = GameStatus.objects.create(current_game=current_game)
-            first_question = Question.objects.filter(Q(game=current_game) & Q(is_fast_money=False)).order_by('question_order')[0] # Get the first question in the seleced game
-            last_question = Question.objects.filter(Q(game=current_game) & Q(is_fast_money=False)).order_by('-question_order')[0]
-            new_game_status.current_question = first_question
-            new_game_status.last_question = last_question
-            new_game_status.save()
-            fast_money_questions = Question.objects.filter(Q(game=current_game) & Q(is_fast_money=True))
-            for question in fast_money_questions:
-                # We create empty answers for both player 1 and 2 for fast money so the objects exist in the state object
-                player_1_answer = FastMoneyAnswer.objects.create(game_status=new_game_status, question=question, player=1)
-                player_2_answer = FastMoneyAnswer.objects.create(game_status=new_game_status, question=question, player=2)
-                player_1_answer.save()
-                player_2_answer.save()
-        except Exception as e:
-            print(e)
-            return JsonResponse({'isSuccessful': False})
-        send_current_game_state(get_current_game_state_as_dict())
-        return JsonResponse({'isSuccessful': True, 'state': get_current_game_state_as_dict()})
+        data_response = data_handler.createNewGame(request.POST['game'])
+        if data_response['isSuccessful']:
+            data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
+        return setJsonResponse(data_response)
 
 @csrf_exempt
 def nextQuestion(request):
     """ Finds the next question and makes it the current_question. Also resets values such as question_total and total_wrong. """
     if request.method == 'POST':
-        try:
-            current_game_status = getCurrentGameStatus()
-            order = current_game_status.current_question.question_order
-            next_question = Question.objects.filter(Q(game=current_game_status.current_game) & Q(is_fast_money=False) & Q(question_order__gt=order)).order_by('question_order')
-            if next_question.count() == 0:
-                return JsonResponse({'isSuccessful': False, 'text': 'Last Question reached.'})
-            current_game_status.current_question = next_question[0]
-            current_game_status.displayed_answers.clear()
-            current_game_status.question_total = 0
-            current_game_status.question_total_wrong = 0
-            current_game_status.display_logo = True
-            current_game_status.save()
-        except Exception as e:
-            print(e)
-            return JsonResponse({'isSuccessful': False})
-        send_current_game_state(get_current_game_state_as_dict())
-        return JsonResponse({'isSuccessful': True, 'state': get_current_game_state_as_dict()})
+        data_response = data_handler.setNextQuestion()
+        if data_response['isSuccessful']:
+            data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
+        return setJsonResponse(data_response)
 
 @csrf_exempt
 def displayAnswer(request):
     """ Pass in an 'answerId' as formdata to add it to the 'currently_displayed' array and add it's value to the question_total. """
     if request.method == 'POST':
-        try:
-            answer_id = request.POST['answerId']
-            current_game_status = getCurrentGameStatus()
-
-            answer_to_display = Answer.objects.filter(pk=answer_id)  # Get the answer associated the id
-            if not answer_to_display:  # No answer with that ID found
-                return JsonResponse({'isSuccessful': False, 'errorText': 'Answer does not exist.'})
-            if answer_to_display[0].question_id != current_game_status.current_question.pk:  # Answer is not for the current question.
-                return JsonResponse({'isSuccessful': False, 'errorText': 'That answer does not belong to the current question.'})
-
-            current_game_status.displayed_answers.add(answer_to_display[0])
-            current_game_status.save()
-
-            currently_displayed = list(current_game_status.displayed_answers.values())
-            current_game_status.question_total = sumAnswerTotals(currently_displayed)
-            current_game_status.save()
-
-        except Exception as e:
-            print(e)
-            return JsonResponse({'isSuccessful': False})
-        send_current_game_state(get_current_game_state_as_dict())
-        return JsonResponse({'isSuccessful': True, 'state': get_current_game_state_as_dict()})
+        answer_id = request.POST['answerId']
+        data_response = data_handler.displayAnswer(answer_id)
+        if data_response['isSuccessful']:
+            data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
+        return setJsonResponse(data_response)
 
 @csrf_exempt
 def hideAnswer(request):
     """ Pass in an 'answerId' as formdata to add it to the 'currently_displayed' array and add it's value to the question_total. """
     if request.method == 'POST':
-        try:
-            answer_id = request.POST['answerId']
-            current_game_status = getCurrentGameStatus()
-
-            answer_to_hide = Answer.objects.filter(Q(pk=answer_id) & Q(gamestatus__pk=current_game_status.pk))
-            if not answer_to_hide:  # No answer with that ID found
-                return JsonResponse({'isSuccessful': False, 'errorText': 'Answer is not being displayed.'})
-        
-            current_game_status.displayed_answers.remove(answer_to_hide[0])
-            current_game_status.save()
-
-            currently_displayed = list(current_game_status.displayed_answers.values())
-            current_game_status.question_total = sumAnswerTotals(currently_displayed)
-            current_game_status.save()
-        except Exception as e:
-            print(e)
-            return JsonResponse({'isSuccessful': False})
-        send_current_game_state(get_current_game_state_as_dict())
-        return JsonResponse({'isSuccessful': True, 'state': get_current_game_state_as_dict()})
+        answer_id = request.POST['answerId']
+        data_response = data_handler.hideAnswer(answer_id)
+        if data_response['isSuccessful']:
+            data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
+        return setJsonResponse(data_response)
 
 @csrf_exempt
 def addWrong(request):
     """ Adds a single one to the current question_total_wrong, setting it back to 0 if it reaches 4. """
     if request.method == 'POST':
-        current_game_status = getCurrentGameStatus()
-        current_game_status.question_total_wrong += 1
-        if current_game_status.question_total_wrong >= 4:
-            current_game_status.question_total_wrong = 0
-        current_game_status.save()
-        game_state = get_current_game_state_as_dict()
-        game_state['show_total_wrong'] = True
-        send_current_game_state(game_state)
-        return JsonResponse({'isSuccessful': True, 'state': get_current_game_state_as_dict()})
+        data_response = data_handler.addToWrongAnswerCount()
+
+        if data_response['isSuccessful']:
+            game_state = data_handler.get_current_game_state_as_dict()
+            game_state['show_total_wrong'] = True
+            data_handler.send_current_game_state(game_state)
+        
+        return setJsonResponse(data_response)
 
 @csrf_exempt
 def awardPoints(request):
     """ Award points of question_total to a given team. Pass in 'teamToReward' as either 'one' or 'two' to award the points. """
     if request.method == 'POST':
         team_to_reward = request.POST['teamToReward']
-        if team_to_reward != 'one' and team_to_reward != 'two':
-            print(team_to_reward)
-            return JsonResponse({'isSuccessful': False, 'errorText': 'Please pick team "one" or team "two"'})
-        current_game_status = getCurrentGameStatus()
-        if team_to_reward == 'one':
-            current_game_status.team_1_score += current_game_status.question_total
-        elif team_to_reward == 'two':
-            current_game_status.team_2_score += current_game_status.question_total
-        current_game_status.question_total = 0
-        current_game_status.save()
-        send_current_game_state(get_current_game_state_as_dict())
-        return JsonResponse({'isSuccessful': True, 'state': get_current_game_state_as_dict()})
+        data_response = data_handler.awardPoints(team_to_reward)
+
+        if data_response['isSuccessful']:
+            data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
+        return setJsonResponse(data_response)
 
 @csrf_exempt
 def editPoints(request):
@@ -276,38 +122,33 @@ def editPoints(request):
     if request.method == 'POST':
         team_one_points = request.POST['teamOnePoints']
         team_two_points = request.POST['teamTwoPoints']
-
-        current_game_status = getCurrentGameStatus()
-        current_game_status.team_1_score = team_one_points
-        current_game_status.team_2_score = team_two_points
-        current_game_status.save()
-        send_current_game_state(get_current_game_state_as_dict())
-        return JsonResponse({'isSuccessful': True, 'state': get_current_game_state_as_dict()})
+        data_response = data_handler.editTeamPoints(team_one_points, team_two_points)
+        if data_response['isSuccessful']:
+            data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
+        return setJsonResponse(data_response)
 
 @csrf_exempt
 def revealBoard(request):
     if request.method == 'POST':
-        current_game_status = getCurrentGameStatus()
-        current_game_status.display_logo = False
-        current_game_status.save()
-        send_current_game_state(get_current_game_state_as_dict())
-        return JsonResponse({'isSuccessful': True, 'state': get_current_game_state_as_dict()})
+        data_response = data_handler.toggleLogo(display_logo=False)
+        if data_response['isSuccessful']:
+            data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
+        return setJsonResponse(data_response)
 
 @csrf_exempt
 def hideBoard(request):
     if request.method == 'POST':
-        current_game_status = getCurrentGameStatus()
-        current_game_status.display_logo = True
-        current_game_status.save()
-        send_current_game_state(get_current_game_state_as_dict())
-        return JsonResponse({'isSuccessful': True, 'state': get_current_game_state_as_dict()})
+        data_response = data_handler.toggleLogo(display_logo=True)
+        if data_response['isSuccessful']:
+            data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
+        return setJsonResponse(data_response)
 
 @csrf_exempt
 def showSingleX(request):
     if request.method == 'POST':
-        game_state = get_current_game_state_as_dict()
+        game_state = data_handler.get_current_game_state_as_dict()
         game_state['show_single_x'] = True
-        send_current_game_state(game_state)
+        data_handler.send_current_game_state(game_state)
         return JsonResponse({'isSuccessful': True})
 
 @csrf_exempt
@@ -316,30 +157,30 @@ def editTotalWrong(request):
     if request.method == 'POST':
         total_wrong = request.POST['totalWrong']
         show_buzzer = request.POST['showBuzzer']
-        current_game_status = getCurrentGameStatus()
-        current_game_status.question_total_wrong = total_wrong
-        current_game_status.save()
-        game_state = get_current_game_state_as_dict()
-        print(show_buzzer)
-        if show_buzzer == '1':
-            game_state['show_total_wrong'] = True
-        send_current_game_state(game_state)
-        return JsonResponse({'isSuccessful': True, 'state': get_current_game_state_as_dict()})
+
+        data_response = data_handler.editTotalWrong(total_wrong)
+
+        if data_response['isSuccessful']:
+            game_state = data_handler.get_current_game_state_as_dict()
+            if show_buzzer == '1':
+                game_state['show_total_wrong'] = True
+            data_handler.send_current_game_state(game_state)
+
+        return setJsonResponse(data_response)
 
 @csrf_exempt
 def answerFastMoney(request):
     """ Inserts the text of a fast money answer. """
     if request.method == 'POST':
-        answer = request.POST['answer']
+        answer_text = request.POST['answer']
         question = request.POST['question']
         player = request.POST['player']
-        current_game_status = getCurrentGameStatus()
-        question = Question.objects.get(pk=question)
-        fast_money_answer = FastMoneyAnswer.objects.filter(Q(question=question) & Q(game_status=current_game_status) & Q(player=player))[0]
-        fast_money_answer.answer_text = answer
-        fast_money_answer.save()
-        send_current_game_state(get_current_game_state_as_dict())
-        return JsonResponse({'isSuccessful': True, 'state': get_current_game_state_as_dict()})
+
+        data_response = data_handler.updateFastMoneyAnswer(answer_text, question, player)
+
+        if data_response['isSuccessful']:
+            data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
+        return setJsonResponse(data_response)
 
 @csrf_exempt
 def assignPointValue(request):
@@ -348,21 +189,12 @@ def assignPointValue(request):
         answer_id = request.POST['answer_id']
         question = request.POST['question']
         player = request.POST['player']
-        current_game_status = getCurrentGameStatus()
-        try:
-            question = Question.objects.get(pk=question)
-            fast_money_answer = FastMoneyAnswer.objects.filter(Q(question=question) & Q(game_status=current_game_status) & Q(player=player))[0]
-            if int(answer_id) > 0:
-                answer = Answer.objects.get(pk=answer_id)
-                fast_money_answer.point_value = answer.point_value
-            else:
-                fast_money_answer.point_value = 0
-            fast_money_answer.save()
-        except Exception as e:
-            print(e)
-            return JsonResponse({'isSuccessful': False})
-        send_current_game_state(get_current_game_state_as_dict())
-        return JsonResponse({'isSuccessful': True, 'state': get_current_game_state_as_dict()})
+        
+        data_response = data_handler.assignFastMoneyAnswerPointValue(answer_id, question, player)
+
+        if data_response['isSuccessful']:
+            data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
+        return setJsonResponse(data_response)
 
 @csrf_exempt
 def toggleFastMoneyAnswer(request):
@@ -371,20 +203,12 @@ def toggleFastMoneyAnswer(request):
         question_id = request.POST['question']
         player = request.POST['player']
         display_it = request.POST['displayIt']
-        current_game_status = getCurrentGameStatus()
-        try:
-            question = Question.objects.get(pk=question_id)
-            fast_money_answer = FastMoneyAnswer.objects.filter(Q(question=question) & Q(game_status=current_game_status) & Q(player=player))[0]
-            if display_it == '1':
-                fast_money_answer.display_answer = True
-            else:
-                fast_money_answer.display_answer = False
-            fast_money_answer.save()
-        except Exception as e:
-            print(e)
-            return JsonResponse({'isSuccessful': False})
-        send_current_game_state(get_current_game_state_as_dict())
-        return JsonResponse({'isSuccessful': True, 'state': get_current_game_state_as_dict()})
+
+        data_response = data_handler.toggleFastMoneyAnswerDisplay(question_id, player, display_it)
+
+        if data_response['isSuccessful']:
+            data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
+        return setJsonResponse(data_response)
 
 @csrf_exempt
 def toggleFastMoneyValue(request):
@@ -393,35 +217,24 @@ def toggleFastMoneyValue(request):
         question_id = request.POST['question']
         player = request.POST['player']
         display_it = request.POST['displayIt']
-        current_game_status = getCurrentGameStatus()
-        try:
-            question = Question.objects.get(pk=question_id)
-            fast_money_answer = FastMoneyAnswer.objects.filter(Q(question=question) & Q(game_status=current_game_status) & Q(player=player))[0]
-            if display_it == '1':
-                fast_money_answer.display_value = True
-            else:
-                fast_money_answer.display_value = False
-            fast_money_answer.save()
-        except Exception as e:
-            print(e)
-            return JsonResponse({'isSuccessful': False})
-        send_current_game_state(get_current_game_state_as_dict())
-        return JsonResponse({'isSuccessful': True, 'state': get_current_game_state_as_dict()})
+
+        data_response = data_handler.toggleFastMoneyValueDisplay(question_id, player, display_it)
+ 
+        if data_response['isSuccessful']:
+            data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
+        return setJsonResponse(data_response)
 
 @csrf_exempt
 def setTimer(request):
     """ Assigns a point value to a given fast money answer using the answer ID . """
     if request.method == 'POST':
         timer = request.POST['timer']
-        current_game_status = getCurrentGameStatus()
-        try:
-            current_game_status.timer = timer
-            current_game_status.save()
-        except Exception as e:
-            print(e)
-            return JsonResponse({'isSuccessful': False})
-        send_current_game_state(get_current_game_state_as_dict())
-        return JsonResponse({'isSuccessful': True, 'state': get_current_game_state_as_dict()})
+
+        data_response = data_handler.updateTimer(timer)
+
+        if data_response['isSuccessful']:
+            data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
+        return setJsonResponse(data_response)
 
 @csrf_exempt
 def toggleTimer(request):
@@ -429,7 +242,7 @@ def toggleTimer(request):
     if request.method == 'POST':
         startTimer = request.POST['startTimer']
         try:
-            game_state = get_current_game_state_as_dict()
+            game_state = data_handler.get_current_game_state_as_dict()
             if startTimer == '1':
                 game_state['fast_money']['start_timer'] = True
                 game_state['fast_money']['stop_timer'] = False
@@ -439,24 +252,17 @@ def toggleTimer(request):
         except Exception as e: 
             print(e)
             return JsonResponse({'isSuccessful': False})
-        send_current_game_state(game_state)
-        return JsonResponse({'isSuccessful': True, 'state': get_current_game_state_as_dict()})
+        data_handler.send_current_game_state(game_state)
+        return JsonResponse({'isSuccessful': True, 'state': data_handler.get_current_game_state_as_dict()})
 
 @csrf_exempt
 def toggleFastMoney(request):
     """ Assigns a point value to a given fast money answer using the answer ID . """
     if request.method == 'POST':
         start_fast_money = request.POST['startFastMoney']
-        try:
-            currentGameStatus = getCurrentGameStatus()
-            if start_fast_money == '1':
-                currentGameStatus.is_fast_money = True
-                currentGameStatus.display_logo = True
-            else:
-                currentGameStatus.is_fast_money = False
-            currentGameStatus.save()
-        except Exception as e:
-            print(e)
-            return JsonResponse({'isSuccessful': False})
-        send_current_game_state(get_current_game_state_as_dict())
-        return JsonResponse({'isSuccessful': True, 'state': get_current_game_state_as_dict()})
+        
+        data_response = data_handler.toggleFastMoney(start_fast_money)
+
+        if data_response['isSuccessful']:
+            data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
+        return setJsonResponse(data_response)
