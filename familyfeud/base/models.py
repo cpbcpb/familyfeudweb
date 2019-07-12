@@ -33,11 +33,13 @@ class GameStatus(models.Model):
     question_total_wrong = models.IntegerField(default=0)
     display_logo = models.BooleanField(default=True)
     create_date = models.DateTimeField(default=now)
+    points_awarded = models.BooleanField(default=False)
     displayed_answers = models.ManyToManyField(Answer, blank=True)
     is_fast_money = models.BooleanField(default=False)
     player_1_score = models.IntegerField(default=0)
     player_2_score = models.IntegerField(default=0)
     timer = models.IntegerField(default=20)
+    display_timer = models.BooleanField(default=False)
     last_question = models.ForeignKey(Question, related_name='last_question', on_delete=models.CASCADE, null=True, blank=True)
 
 

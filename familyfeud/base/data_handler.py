@@ -71,11 +71,13 @@ def get_current_game_state_as_dict():
         'create_date': current_game_status.create_date.__str__(),
         'display_logo': current_game_status.display_logo,
         'current_answers': current_answers,
+        'points_awarded': current_game_status.points_awarded,
         'is_fast_money': current_game_status.is_fast_money,
         'fast_money': {
             'player_1_score': current_game_status.player_1_score,
             'player_2_score': current_game_status.player_2_score,
             'timer': current_game_status.timer,
+            'display_timer': current_game_status.display_timer,
             'start_timer': False,
             'stop_timer': False,
             'questions': questions
@@ -123,6 +125,7 @@ def setNextQuestion():
         current_game_status.displayed_answers.clear()
         current_game_status.question_total = 0
         current_game_status.question_total_wrong = 0
+        current_game_status.points_awarded = False
         current_game_status.display_logo = True
         current_game_status.save()
     except Exception as e:
@@ -142,10 +145,10 @@ def displayAnswer(answer_id):
 
         current_game_status.displayed_answers.add(answer_to_display[0])
         current_game_status.save()
-
-        currently_displayed = list(current_game_status.displayed_answers.values())
-        current_game_status.question_total = sumAnswerTotals(currently_displayed)
-        current_game_status.save()
+        if not current_game_status.points_awarded:
+            currently_displayed = list(current_game_status.displayed_answers.values())
+            current_game_status.question_total = sumAnswerTotals(currently_displayed)
+            current_game_status.save()
     except Exception as e:
         print(e)
         return {'isSuccessful': False}
@@ -161,9 +164,10 @@ def hideAnswer(answer_id):
         current_game_status.displayed_answers.remove(answer_to_hide[0])
         current_game_status.save()
 
-        currently_displayed = list(current_game_status.displayed_answers.values())
-        current_game_status.question_total = sumAnswerTotals(currently_displayed)
-        current_game_status.save()
+        if not current_game_status.points_awarded:
+            currently_displayed = list(current_game_status.displayed_answers.values())
+            current_game_status.question_total = sumAnswerTotals(currently_displayed)
+            current_game_status.save()
     except Exception as e:
         print(e)
         return {'isSuccessful': False}
@@ -186,6 +190,7 @@ def awardPoints(team_to_reward):
     elif team_to_reward == 'two':
         current_game_status.team_2_score += current_game_status.question_total
     current_game_status.question_total = 0
+    current_game_status.points_awarded = True
     current_game_status.save()
     return {'isSuccessful': True}
 
@@ -278,6 +283,19 @@ def updateTimer(timer_value):
         current_game_status = getCurrentGameStatus()
         current_game_status.timer = timer_value
         current_game_status.save()
+    except Exception as e:
+        print(e)
+        return {'isSuccessful': False}
+    return {'isSuccessful': True}
+
+def toggleDisplayTimer(display_timer):
+    try:
+        currentGameStatus = getCurrentGameStatus()
+        if display_timer == '1':
+            currentGameStatus.display_timer = True
+        else:
+            currentGameStatus.display_timer = False
+        currentGameStatus.save()
     except Exception as e:
         print(e)
         return {'isSuccessful': False}

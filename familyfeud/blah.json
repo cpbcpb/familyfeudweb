@@ -7,7 +7,7 @@
     "current_question_id": 4,
     "current_question": {
         "id": 4,
-        "question_text": "When dating, women pretend to love sports. What do men pretend to love?",
+        "question_text": "Bees?",
         "game": 3,
         "question_order": 100
     },
@@ -57,6 +57,8 @@
             "currently_displayed": false
         }
     ],
+    "points_awarded": true,
+    "is_fast_money": true,
     "fast_money": {
         "player_1_score": 0,
         "player_2_score": 0,
@@ -67,8 +69,12 @@
                 "id": 15, 
                 "player_1": {"answer": "Blah", "value": 12, "display_answer": true, "display_value": true},
                 "player_2": {"answer": "Wow", "value": 42, "display_answer": true, "display_value": false}
-            }
-        ]
+            },
+        ],
+        "timer": 20,
+        "display_timer": true,
+        "start_timer": false,
+        "stop_timer": false
     },
     "show_single_x": false,
     "show_total_wrong": false,
