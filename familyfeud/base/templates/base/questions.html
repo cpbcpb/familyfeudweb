@@ -45,14 +45,7 @@
 <body>
     <div id="app">
         <h1>Questions</h1>
-        <table class='answers-table'>
-            <tr v-for="(answer, index) in answers.slice(0,4)">
-                <td class="answer-text"><p v-if="getAnswerInfo(index, 'displayIt')">[[ getAnswerInfo(index, 'text') ]]</p></td>
-                <td class="answer-value"><p v-if="getAnswerInfo(index, 'displayIt')">[[ getAnswerInfo(index, 'value')]]</p></td>
-                <td class="answer-text"><p v-if="getAnswerInfo(index+4, 'displayIt')">[[ getAnswerInfo(index+4, 'text') ]]</p></td>
-                <td class="answer-value"><p v-if="getAnswerInfo(index+4, 'displayIt')">[[ getAnswerInfo(index+4, 'value') ]]</p></td>
-            </tr>
-        </table>
+
         <h4>Total: [[total]]</h4>
         <h2><b class="red" v-for="n in wrongAnswers">X</b></h2>
     </div>
@@ -62,11 +55,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <script>
-    answer_list = {{answers}}
-    answer_list.sort(function (a, b) { return (a.value < b.value) ? 1 : -1}) // We sort the answers by score value so that the highest value is first,
-    answer_list.forEach(function(element) {
-        element.displayIt = false;
-    })
     
     var app = new Vue({
         delimiters: ['[[', ']]'],
@@ -75,7 +63,6 @@
             displaySocket: new WebSocket(
                 'ws://' + window.location.host + '/ws/display_answer/'
             ),
-            answers: answer_list,
             total: 0,
             wrongAnswers: 0
         },

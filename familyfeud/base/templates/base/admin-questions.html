@@ -15,10 +15,11 @@
             <div class="newGameSection">
                 <h2>Start New Game</h2>
                 <select class="form-control" v-model="gameToStart">
-                    <option value="0" disabled>SELECT A QUESTION SET</option>
+                    <option value="0" disabled>Select a Question Set</option>
                     <option v-for="question_set in question_sets" v-bind:value="question_set.id">[[question_set.friendly_name]]</option>
                 </select><br>
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmNewGame">
+                <p v-if="startNewGameError" class="alert alert-danger">[[startNewGameError]]</p>
+                <button type="button" class="btn btn-primary" v-on:click="showNewGameModal">
                 Start New Game
                 </button>
 
@@ -67,27 +68,27 @@
                     <button v-on:click="awardPoints('one')" class="btn btn-primary">Award Team 1 Points</button>
                     <button v-on:click="awardPoints('two')" class="btn btn-primary">Award Team 2 Points</button>
                     <table class='answers-table'>
-                        <tr v-for="(answer, index) in state.current_answers.slice(0,4)">
+                        <tr v-for="index in 4">
                             <td class="answer-text">
                                 <p>[[ getAnswerInfo(index, 'answer_text') ]]</p>
-                                <button class="btn btn-success" v-if="!getAnswerInfo(index, 'currently_displayed')" v-on:click="displayAnswer(getAnswerInfo(index, 'id'))">Display it!</button>
-                                <button class="btn btn-danger" v-if="getAnswerInfo(index, 'currently_displayed')" v-on:click="hideAnswer(getAnswerInfo(index, 'id'))">Hide It!</button>
+                                <button class="btn btn-success display" v-if="!getAnswerInfo(index, 'currently_displayed') && getAnswerInfo(index, 'currently_displayed') !== ''" v-on:click="displayAnswer(getAnswerInfo(index, 'id'))">Display it!</button>
+                                <button class="btn btn-danger display" v-if="getAnswerInfo(index, 'currently_displayed')" v-on:click="hideAnswer(getAnswerInfo(index, 'id'))">Hide It!</button>
                             </td>
                             <td class="answer-value">
                                 <p>[[ getAnswerInfo(index, 'point_value')]]</p>
                             </td>
                             <td class="answer-text">
                                 <p>[[ getAnswerInfo(index+4, 'answer_text') ]]</p>
-                                <button class="btn btn-success" v-if="!getAnswerInfo(index+4, 'currently_displayed') && getAnswerInfo(index+4, 'currently_displayed') !== ''" v-on:click="displayAnswer(getAnswerInfo(index+4, 'id'))">Display it!</button>
-                                <button class="btn btn-danger" v-if="getAnswerInfo(index+4, 'currently_displayed')" v-on:click="hideAnswer(getAnswerInfo(index+4, 'id'))">Hide It!</button>
+                                <button class="btn btn-success display" v-if="!getAnswerInfo(index+4, 'currently_displayed') && getAnswerInfo(index+4, 'currently_displayed') !== ''" v-on:click="displayAnswer(getAnswerInfo(index+4, 'id'))">Display it!</button>
+                                <button class="btn btn-danger display" v-if="getAnswerInfo(index+4, 'currently_displayed')" v-on:click="hideAnswer(getAnswerInfo(index+4, 'id'))">Hide It!</button>
                             </td>
                             <td class="answer-value">
                                 <p>[[ getAnswerInfo(index+4, 'point_value') ]]</p>
                             </td>
                         </tr>
                     </table>
-                    <button class="btn btn-danger wrong" v-on:click="addWrongAnswer">WRONG ANSWER</button>
-                    <button class="btn btn-primary" v-on:click="showSingleX">Show Single X</button>
+                    <button class="btn btn-danger wrong" v-on:click="addWrongAnswer">Wrong Answer</button>
+                    <button class="btn btn-warning" v-on:click="showSingleX">Show Single X</button>
                     <br>
                     <b class="wrong-count" v-for="n in state.total_wrong">X </b>
                     <b class="wrong-count wrong-placeholder" v-for="n in 3 - state.total_wrong"> _</b>
@@ -109,9 +110,8 @@
                 </div>
             </div>
             <div class="center-container">
-                <br>
+                <button v-if="state.is_fast_money" v-on:click="toggleFastMoney('0')" class="btn btn-primary">Go back to the Normal Rounds</button><br>
                 <button v-if="!state.is_fast_money" v-on:click="toggleFastMoney('1')" class="btn btn-primary">Start Fast Money</button>
-                <button v-if="state.is_fast_money" v-on:click="toggleFastMoney('0')" class="btn btn-primary">Go back to the Normal Rounds</button>
             </div>
             <div class="fast-money" v-if="state.is_fast_money">
                 <h2>Fast Money</h2>
@@ -123,49 +123,56 @@
                 <button v-on:click="setTimer" class="btn btn-primary">Set Timer</button>
                 <button v-on:click="toggleTimer('1')" class="btn btn-success">Start Timer</button>
                 <button v-on:click="toggleTimer('0')" class="btn btn-danger">Stop Timer</button>
-                <br>
+                <br><br>
                 <div class="center-container">
-                    <h4>Player 1</h4>
-                    <table>
-                        <tr v-for="question in state.fast_money.questions">
-                            <td class="fm-question">[[question.text]]</td>
-                            <td class="fm-input"><input type="text" v-model="question['player_1_answer'].answer_text" v-on:blur="updateFastMoneyAnswer(question.id, 1, $event)"></td>
-                            <td class="fm-select">
-                                <select name="" v-on:change="assignPointValue(question.id, 1, $event)" id="" v-model="question['player_1_answer'].answer_id">
-                                    <option value="" disabled selected>Select an answer</option>
-                                    <option  v-for="answer in fastMoneyAnswers[question.id]" :value="answer.id">[[answer.answer_text]] - [[answer.point_value]]</option>
-                                    <option value="0">Incorrect - 0</option>
-                                </select>
-                            </td>
-                            <td>
-                                <button v-if="!question['player_1_answer'].display_answer" v-on:click="toggleFastMoneyAnswer(question.id, 1, '1')" class="btn btn-success">Display User Answer</button>
-                                <button v-if="question['player_1_answer'].display_answer" v-on:click="toggleFastMoneyAnswer(question.id, 1, '0')" class="btn btn-danger">Hide User Answer</button><br>
-                                <button v-if="!question['player_1_answer'].display_value" v-on:click="toggleFastMoneyValue(question.id, 1, '1')" class="btn btn-success">Display Point Value</button>
-                                <button v-if="question['player_1_answer'].display_value" v-on:click="toggleFastMoneyValue(question.id, 1, '0')" class="btn btn-danger">Hide Point Value</button>
-                            </td>
-                        </tr>                                                                                            
-                    </table>
-                    <br><br>
-                    <h4>Player 2</h4>
-                    <table>
-                        <tr v-for="question in state.fast_money.questions">
-                            <td class="fm-question">[[question.text]]</td>
-                            <td class="fm-input"><input type="text" v-model="question['player_2_answer'].answer_text" v-on:blur="updateFastMoneyAnswer(question.id, 2, $event)"></td>
-                            <td class="fm-select">
-                                <select name="" v-on:change="assignPointValue(question.id, 2, $event)"  v-model="question['player_2_answer'].answer_id" id="">
-                                    <option value="" disabled selected>Select an answer</option>
-                                    <option  v-for="answer in fastMoneyAnswers[question.id]" :value="answer.id">[[answer.answer_text]] - [[answer.point_value]]</option>
-                                    <option value="0">Incorrect - 0</option>
-                                </select>
-                            </td>
-                            <td>
-                                <button v-if="!question['player_2_answer'].display_answer" v-on:click="toggleFastMoneyAnswer(question.id, 2, '1')" class="btn btn-success">Display User Answer</button>
-                                <button v-if="question['player_2_answer'].display_answer" v-on:click="toggleFastMoneyAnswer(question.id, 2, '0')" class="btn btn-danger">Hide User Answer</button><br>
-                                <button v-if="!question['player_2_answer'].display_value" v-on:click="toggleFastMoneyValue(question.id, 2, '1')" class="btn btn-success">Display Point Value</button>
-                                <button v-if="question['player_2_answer'].display_value" v-on:click="toggleFastMoneyValue(question.id, 2, '0')" class="btn btn-danger">Hide Point Value</button>
-                            </td>
-                        </tr>                                                                                            
-                    </table>
+                    <div v-if="currentPlayer == 1">
+                        <h4>Player 1</h4>
+                        <button v-on:click="swapCurrentPlayer(2)" class="btn btn-primary"> Swap to Player 2 </button><br><br>
+                        <table class="fm-table">
+                            <tr v-for="question in state.fast_money.questions">
+                                <td class="fm-question">[[question.text]]</td>
+                                <td class="fm-input"><input type="text" v-model="question['player_1_answer'].answer_text" v-on:blur="updateFastMoneyAnswer(question.id, 1, $event)"></td>
+                                <td class="fm-select">
+                                    <select name="" v-on:change="assignPointValue(question.id, 1, $event)" id="" v-model="question['player_1_answer'].answer_id">
+                                        <option value="" disabled selected>Select an answer</option>
+                                        <option  v-for="answer in fastMoneyAnswers[question.id]" :value="answer.id">[[answer.answer_text]] - [[answer.point_value]]</option>
+                                        <option value="0">Incorrect - 0</option>
+                                    </select>
+                                </td>
+                                <td class="fm-display">
+                                    <button v-if="!question['player_1_answer'].display_answer" v-on:click="toggleFastMoneyAnswer(question.id, 1, '1')" class="btn btn-success">Display User Answer</button>
+                                    <button v-if="question['player_1_answer'].display_answer" v-on:click="toggleFastMoneyAnswer(question.id, 1, '0')" class="btn btn-danger">Hide User Answer</button><br>
+                                    <button v-if="!question['player_1_answer'].display_value" v-on:click="toggleFastMoneyValue(question.id, 1, '1')" class="btn btn-success">Display Point Value</button>
+                                    <button v-if="question['player_1_answer'].display_value" v-on:click="toggleFastMoneyValue(question.id, 1, '0')" class="btn btn-danger">Hide Point Value</button>
+                                </td>
+                            </tr>                                                                                      
+                        </table>
+                    </div>
+                    <div v-if="currentPlayer == 2">
+                        <p class="alert alert-warning">The board has automatically been hidden. Make sure to reveal it once the player is facing away from the board.</p>
+                        <h4>Player 2</h4>
+                        <button v-on:click="swapCurrentPlayer(1)" class="btn btn-primary"> Swap to Player 1 </button><br><br>
+                        <button v-on:click="showSingleX" class="btn btn-danger">Repeated Answer</button><br>
+                        <table  class="fm-table">
+                            <tr v-for="question in state.fast_money.questions">
+                                <td class="fm-question">[[question.text]]</td>
+                                <td class="fm-input"><p><b>Player 1:</b> [[question['player_1_answer'].answer_text]]</p><input type="text" v-model="question['player_2_answer'].answer_text" v-on:blur="updateFastMoneyAnswer(question.id, 2, $event)"></td>
+                                <td class="fm-select">
+                                    <select name="" v-on:change="assignPointValue(question.id, 2, $event)"  v-model="question['player_2_answer'].answer_id" id="">
+                                        <option value="" disabled selected>Select an answer</option>
+                                        <option  v-for="answer in fastMoneyAnswers[question.id]" :value="answer.id">[[answer.answer_text]] - [[answer.point_value]]</option>
+                                        <option value="0">Incorrect - 0</option>
+                                    </select>
+                                </td>
+                                <td  class="fm-display">
+                                    <button v-if="!question['player_2_answer'].display_answer" v-on:click="toggleFastMoneyAnswer(question.id, 2, '1')" class="btn btn-success">Display User Answer</button>
+                                    <button v-if="question['player_2_answer'].display_answer" v-on:click="toggleFastMoneyAnswer(question.id, 2, '0')" class="btn btn-danger">Hide User Answer</button><br>
+                                    <button v-if="!question['player_2_answer'].display_value" v-on:click="toggleFastMoneyValue(question.id, 2, '1')" class="btn btn-success">Display Point Value</button>
+                                    <button v-if="question['player_2_answer'].display_value" v-on:click="toggleFastMoneyValue(question.id, 2, '0')" class="btn btn-danger">Hide Point Value</button>
+                                </td>
+                            </tr>                                                                                            
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -192,8 +199,8 @@
         delimiters: ['[[', ']]'],
         el: '#app',
         data: {
-            showHello: false,
             question_sets: question_set_list,
+            startNewGameError: '',
             state: state,
             gameToStart: 0,
             fastMoneyAnswers: fast_money_answers,
@@ -204,9 +211,24 @@
             editTotalWrong: 0,
             player1Answers:{},
             player2Answers:{},
-            isLastQuestion: false
+            showModal: true,
+            currentPlayer: 1
         },
         methods: {
+            showNewGameModal: function (){
+                if (this.gameToStart == 0) {
+                    this.startNewGameError = 'You must select a valid question set.';
+                } else {
+                    this.startNewGameError = '';
+                    $('#confirmNewGame').modal();
+                }
+            },
+            swapCurrentPlayer: function (player) {
+                this.currentPlayer = player;
+                if (this.currentPlayer === 2) {
+                    this.hideBoard();
+                }
+            },
             displayAnswer: function(answerId) {
                 var formData = new FormData()
                 formData.set('answerId', answerId)
@@ -270,7 +292,6 @@
                 axios({
                     method: 'post',
                     url: '/base/admin/showSingleX/'
-                }).then(function (response) {
                 })
             },
             createNewGame: function(gameId) {
@@ -309,7 +330,6 @@
                     url: '/base/admin/editPoints/',
                     data: formData
                 }).then(function (response) {
-                    console.log(response)
                     if (response['data']['isSuccessful']) {
                         app.state = response['data']['state']
                     }
@@ -440,7 +460,6 @@
                 }).then(function (response) {
                     if (response['data']['isSuccessful']) {
                         app.state = response['data']['state']
-                        console.log(state)
                     }
                 })
             },
@@ -459,6 +478,8 @@
             },
 
         }
+        
     })
+
 </script>
 </html>
