@@ -11,7 +11,7 @@
 </head>
 <body>
 <div id="app">
-
+[[sortedAnswers]]
     <div class="logo-oval"v-show="state.display_logo">
         <div class="logo-text-box" >
             <div>
@@ -25,17 +25,19 @@
             </div>
         </div>
     </div>
-    <div id="score-top" class="score" v-if="!state.display_logo">
-        [[state.question_total]]
-    </div>
-    <div id="scores-and-board">
-        <div id="score-left" class="score float-left" v-if="!state.display_logo">
-            [[state.team_1_score]]
-        </div>
-        <div class="game-grid" v-if="!state.display_logo">
-            <div class="game-column">
-                <div class="answer-box" v-if="sortedAnswers[0]" v-bind:class="{flippy : sortedAnswers[0].currently_displayed}" >
-                    <div class="flip-card-inner">
+    <div v-if="!state.no_active_games">
+        <div id="regular-game" v-if="!state.is_fast_money">
+            <div id="score-top" class="score" v-if="!state.display_logo">
+                [[state.question_total]]
+            </div>
+            <div id="scores-and-board">
+                <div id="score-left" class="score float-left" v-if="!state.display_logo">
+                    [[state.team_1_score]]
+                </div>
+                <div class="game-grid" v-if="!state.display_logo">
+                    <div class="game-column">
+                    <div class="answer-box" v-if="sortedAnswers[0]"  v-bind:class="{flippy : sortedAnswers[0].currently_displayed}">
+                        <div class="flip-card-inner">
                             <div class="flip-card-front">
                                 <div class="number">1</div>
                             </div>
@@ -43,117 +45,150 @@
                                 <div class="answer-text">[[sortedAnswers[0].answer_text]]</div>
                                 <div class="answer-points">[[sortedAnswers[0].point_value]]</div>
                             </div>
-                    </div>
-                </div>
-                <div v-else class="answer-box ">
-                </div>
-               <div class="answer-box" v-if="sortedAnswers[1]"  v-bind:class="{flippy : sortedAnswers[1].currently_displayed}">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <div class="number">2</div>
                         </div>
-                        <div class="flip-card-back">
+                    </div>
+                    <div v-else  class="answer-box">
+                    </div>
+                    <div class="answer-box" v-if="sortedAnswers[1]"  v-bind:class="{flippy : sortedAnswers[1].currently_displayed}">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <div class="number">2</div>
+                            </div>
+                            <div class="flip-card-back">
                                 <div class="answer-text">[[sortedAnswers[1].answer_text]]</div>
                                 <div class="answer-points">[[sortedAnswers[1].point_value]]</div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div v-else  class="answer-box">
-                </div>
-               <div class="answer-box" v-if="sortedAnswers[2]" v-bind:class="{flippy : sortedAnswers[2].currently_displayed}">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <div class="number">3</div>
+                    <div v-else  class="answer-box">
+                    </div>
+                    <div class="answer-box" v-if="sortedAnswers[2]" v-bind:class="{flippy : sortedAnswers[2].currently_displayed}">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <div class="number">3</div>
+                                </div>
+                                <div class="flip-card-back">
+                                        <div class="answer-text">[[sortedAnswers[2].answer_text]]</div>
+                                        <div class="answer-points">[[sortedAnswers[2].point_value]]</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flip-card-back">
-                                <div class="answer-text">[[sortedAnswers[2].answer_text]]</div>
-                                <div class="answer-points">[[sortedAnswers[2].point_value]]</div>
+                        <div v-else  class="answer-box">
+                        </div>
+                    <div class="answer-box" v-if="sortedAnswers[3]" v-bind:class="{flippy : sortedAnswers[3].currently_displayed}">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <div class="number">4</div>
+                                </div>
+                                <div class="flip-card-back">
+                                        <div class="answer-text">[[sortedAnswers[3].answer_text]]</div>
+                                        <div class="answer-points">[[sortedAnswers[3].point_value]]</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else  class="answer-box">
                         </div>
                     </div>
-                </div>
-                <div v-else  class="answer-box">
-                </div>
-               <div class="answer-box" v-if="sortedAnswers[3]" v-bind:class="{flippy : sortedAnswers[3].currently_displayed}">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <div class="number">4</div>
+                    <div class="game-column">
+                                <div class="answer-box" v-if="sortedAnswers[4]" v-bind:class="{flippy : sortedAnswers[4].currently_displayed}">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <div class="number">5</div>
+                                </div>
+                                <div class="flip-card-back">
+                                        <div class="answer-text">[[sortedAnswers[4].answer_text]]</div>
+                                        <div class="answer-points">[[sortedAnswers[4].point_value]]</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flip-card-back">
-                                <div class="answer-text">[[sortedAnswers[3].answer_text]]</div>
-                                <div class="answer-points">[[sortedAnswers[3].point_value]]</div>
+                        <div v-else  class="answer-box">
+                        </div>
+                        <div class="answer-box" v-if="sortedAnswers[5]" v-bind:class="{flippy : sortedAnswers[5].currently_displayed}">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <div class="number">6</div>
+                                </div>
+                                <div class="flip-card-back">
+                                        <div class="answer-text">[[sortedAnswers[5].answer_text]]</div>
+                                        <div class="answer-points">[[sortedAnswers[5].point_value]]</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else  class="answer-box">
+                        </div>
+                    <div class="answer-box" v-if="sortedAnswers[6]" v-bind:class="{flippy : sortedAnswers[6].currently_displayed}">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <div class="number">7</div>
+                                </div>
+                                <div class="flip-card-back">
+                                        <div class="answer-text">[[sortedAnswers[6].answer_text]]</div>
+                                        <div class="answer-points">[[sortedAnswers[6].point_value]]</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else  class="answer-box">
+                        </div>
+                    <div class="answer-box" v-if="sortedAnswers[7]" v-bind:class="{flippy : sortedAnswers[7].currently_displayed}">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <div class="number">8</div>
+                                </div>
+                                <div class="flip-card-back">
+                                        <div class="answer-text">[[sortedAnswers[7].answer_text]]</div>
+                                        <div class="answer-points">[[sortedAnswers[7].point_value]]</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else  class="answer-box">
                         </div>
                     </div>
+                    <strikes 
+                        v-bind:show_total_wrong="state.show_total_wrong" 
+                        v-bind:total_wrong="state.total_wrong" 
+                        v-bind:show_single_x="state.show_single_x">
+                    </strikes>
                 </div>
-                <div v-else  class="answer-box">
+                <div  id="score-right" class="score" v-if="!state.display_logo">
+                    [[state.team_2_score]]
                 </div>
             </div>
-            <div class="game-column">
-                           <div class="answer-box" v-if="sortedAnswers[4]" v-bind:class="{flippy : sortedAnswers[4].currently_displayed}">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <div class="number">5</div>
-                        </div>
-                        <div class="flip-card-back">
-                                <div class="answer-text">[[sortedAnswers[4].answer_text]]</div>
-                                <div class="answer-points">[[sortedAnswers[4].point_value]]</div>
-                        </div>
-                    </div>
-                </div>
-                <div v-else  class="answer-box">
-                </div>
-                <div class="answer-box" v-if="sortedAnswers[5]" v-bind:class="{flippy : sortedAnswers[5].currently_displayed}">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <div class="number">6</div>
-                        </div>
-                        <div class="flip-card-back">
-                                <div class="answer-text">[[sortedAnswers[5].answer_text]]</div>
-                                <div class="answer-points">[[sortedAnswers[5].point_value]]</div>
-                        </div>
-                    </div>
-                </div>
-                <div v-else  class="answer-box">
-                </div>
-               <div class="answer-box" v-if="sortedAnswers[6]" v-bind:class="{flippy : sortedAnswers[6].currently_displayed}">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <div class="number">7</div>
-                        </div>
-                        <div class="flip-card-back">
-                                <div class="answer-text">[[sortedAnswers[6].answer_text]]</div>
-                                <div class="answer-points">[[sortedAnswers[6].point_value]]</div>
-                        </div>
-                    </div>
-                </div>
-                <div v-else  class="answer-box">
-                </div>
-               <div class="answer-box" v-if="sortedAnswers[7]" v-bind:class="{flippy : sortedAnswers[7].currently_displayed}">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <div class="number">8</div>
-                        </div>
-                        <div class="flip-card-back">
-                                <div class="answer-text">[[sortedAnswers[7].answer_text]]</div>
-                                <div class="answer-points">[[sortedAnswers[7].point_value]]</div>
-                        </div>
-                    </div>
-                </div>
-                <div v-else  class="answer-box">
-                </div>
-
-
-            </div>
-            <strikes 
-                v-bind:show_total_wrong="state.show_total_wrong" 
-                v-bind:total_wrong="state.total_wrong" 
-                v-bind:show_single_x="state.show_single_x">
-            </strikes>
         </div>
-        <div  id="score-right" class="score" v-if="!state.display_logo">
-            [[state.team_2_score]]
+        <div id="fast-money-game" v-if="state.is_fast_money">
+            <div class="fast-money-grid" v-if="!state.display_logo">
+                <div class="fm-column">
+                    <div class="fm-row" v-for="question in state.fast_money.questions">
+                        <div class="fm-box fm-answer-box">
+                            <span v-if="question.player_1_answer.display_answer">[[question.player_1_answer.answer_text]]</span>
+                        </div>
+                        <div class="fm-box fm-points-box">
+                        <span v-show="question.player_1_answer.display_value">[[question.player_1_answer.point_value]]</span>
+                        </div>
+                    </div>
+                    <div id="total-row" class="fm-row">
+                        <div id= "fm-total" class="fm-box ">
+                        <div> TOTAL</div><div>[[fastMoneyTotal]]</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fm-column">
+                    <div class="fm-row" v-for="question in state.fast_money.questions">
+                        <div class="fm-box fm-answer-box">
+                        <span v-if="question.player_2_answer.display_answer">[[question.player_2_answer.answer_text]]</span>
+                        </div>
+                        <div class="fm-box fm-points-box">
+                        <span v-show="question.player_2_answer.display_value">[[question.player_2_answer.point_value]]</span>
+                        </div>
+                    </div>
+                    <div id="total-row" class="fm-row">
+                        <div id= "fm-total" >
+                       
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <button id="interaction-button" hidden></button>
 </div>
 </body>
 
@@ -242,9 +277,32 @@
                     })
                     return arraySorted
                 }
+            },
+            sortedFastMoneyQuestions: function(){
+                if(this.state.is_fast_money){
+                    let arraySorted = this.state.fast_money.questions.sort((a,b) =>
+                    (a.order > b.order) ? 1 : -1 );
+                    return arraySorted
+                }
+            },
+            fastMoneyTotal : function(){
+                if(this.state.is_fast_money){
+                    let total = 0;
+
+                    this.state.fast_money.questions.forEach(function(question){
+                        if(question.player_1_answer.display_value){
+                            total += question.player_1_answer.point_value;
+                        }
+                        if(question.player_2_answer.display_value){
+                            total += question.player_2_answer.point_value;
+                        }
+                    })
+                    return total;
+                }
             }
         },
         watch: {
+            //Watching sorted answers to see if should reveal a newly displayed answer with flip animation and ding sound
             sortedAnswers: function(newAnswers, oldAnswers){
                 //This checks that this isn't the first load of sortedAnswers ever.
                 if(typeof oldAnswers !== "undefined"){
@@ -285,17 +343,9 @@
             flat middle blue:               #4c6db4
 
 
- {% endcomment %}
+{% endcomment %}
 <style>
-    #app {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
 
-        height: 100vh;
-        width: 100vw;
-    }
     .logo-oval {
         display: flex;
         justify-content: center;
@@ -327,7 +377,12 @@
         z-index: -2;
     }
 
-
+    #regular-game {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
     .logo-text-box {
         position: absolute;
         display: flex;
@@ -336,26 +391,26 @@
         align-items: center;
     }
     .logo-text-box div span {
-    font-size: 100px;
-    font-weight: bold;
-    -webkit-text-stroke: 2px darkred;
-    display: inline-block;
-    font-family:   Courrier, Georgia, Palatino, Garamond, "Times New Roman", Sentinel, Bookman, Times;
-    background-image: -webkit-linear-gradient(#f26521, #fef041);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    position:relative;
-    line-height: .75em;
+        font-size: 100px;
+        font-weight: bold;
+        -webkit-text-stroke: 2px darkred;
+        display: inline-block;
+        font-family: Georgia, Times, "Times New Roman", serif;
+        background-image: -webkit-linear-gradient(#f26521, #fef041);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        position:relative;
+        line-height: .75em;
     }
     .logo-text-box div span::after {
         display: inline-block;
-    content: attr(data-text);
-    left: 0;
-    position: absolute;
-    text-shadow: 5px 5px 5px black;
+        content: attr(data-text);
+        left: 0;
+        position: absolute;
+        text-shadow: 5px 5px 5px black;
         -webkit-text-stroke: 5px white;
-    top: 0;
-    z-index: -1;
+        top: 0;
+        z-index: -1;
     }
     .first-letter {
         font-size: 150px !important;
@@ -401,18 +456,17 @@
     #score-right {
         float: right;
     }
-
     .game-grid {
+        width: 840px;
+        height: 410px;
         display: flex;
+        background-color:black;
         flex-direction: row;
         justify-content: space-evenly;
         border-color: orange;
         border-style: solid;
         border-radius: 20px;
         padding: 10px 10px 10px 10px;
-        background-color:black;
-        width: 840px;
-        height: 410px;
     }
     .game-column {
         display: flex;
@@ -420,7 +474,6 @@
         justify-content: space-evenly;
         align-items: center;
         width: 50%;
-
     }
     .answer-box {
         background-image: radial-gradient(lightblue, dodgerblue, blue);
@@ -485,36 +538,114 @@
         width: inherit;
     }
 
-.flip-card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  transition: transform 0.6s;
-  transform-style: preserve-3d;
-  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-}
+    .flip-card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        transition: transform 0.6s;
+        transform-style: preserve-3d;
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    }
 
-.flippy .flip-card-inner {
-  transform: rotateX(180deg);
-}
+    .flippy .flip-card-inner {
+        transform: rotateX(180deg);
+    }
 
-.flip-card-front, .flip-card-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-}
+    .flip-card-front, .flip-card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+    }
 
-.flip-card-front {
-    display:flex;
-    justify-content: center;
-    align-items: center;
-}
-.flip-card-back {
-    display: flex;
-    flex-direction: row;
-  transform: rotateX(180deg);
-}
+    .flip-card-front {
+        display:flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .flip-card-back {
+        display: flex;
+        flex-direction: row;
+        transform: rotateX(180deg);
+    }
+
+    .fast-money-grid {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: space-around;
+        border-color: black;
+        border-style: double;
+        border-width: 30px;
+        border-radius: 50px;
+        padding: 50px 10px 40px 10px;
+        background-color:blue;
+        width: 840px;
+        height: 600px;
+    }
+
+    .fm-column {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-content: center;
+        align-items: center;
+        width: 50%;
+    }
+    .fm-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-content: center;
+        width: 100%;
+        height: 15%;
+    }
+    .fm-box {
+        display: flex;
+        align-items: center;
+        color: white;
+        background-color: black;
+        margin: 1px;
+        font-size : 25px;
+        padding: 3px;
+        text-transform: uppercase;
+    }
+    .fm-answer-box {
+
+        width:75%;
+        height: 100%;
+    }
+    .fm-points-box {
+        display: flex;
+        align-content: center;
+        justify-content: center;
+        width: 20%;
+        height: 100%;
+
+    }
+    #fm-total {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        width: 60%;
+        padding: 0 10px 0 10px;
+    }
+
 </style>
 </html>
+
+        {% comment %} display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding-bottom: 3px;
+        color: white;
+        text-transform: uppercase;
+        text-shadow: 2px .5px #000000;
+        font-size: 35px;
+        background-image: linear-gradient(dodgerblue, blue, darkblue );
+        height: 100%;
+        width: 85%;
+        line-height: .95em;
+        overflow:hidden; {% endcomment %}
