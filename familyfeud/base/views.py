@@ -17,6 +17,33 @@ def setJsonResponse(data_response):
         else:
             return JsonResponse({'isSuccessful': False})
 
+
+
+def game(request):
+    game_state = data_handler.get_current_game_state_as_dict()
+
+    return render(request, 'base/game_board.html', {
+        'state': mark_safe(json.dumps(game_state))
+    })
+
+@csrf_exempt
+def toggleDisplayTimer(request):
+    """ Assigns a point value to a given fast money answer using the answer ID . """
+    if request.method == 'POST':
+        display_timer = request.POST['displayTimer']
+        
+        data_response = data_handler.toggleDisplayTimer(display_timer)
+
+        if data_response['isSuccessful']:
+            data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
+        return setJsonResponse(data_response)
+
+
+
+def getCurrentGameStatus():
+    if len(GameStatus.objects.filter().order_by('-create_date')) == 0:
+        return {}
+    return GameStatus.objects.filter().order_by('-create_date')[0]
 # Here we begin the actual views / routes
 
 def questions(request):
@@ -239,18 +266,6 @@ def toggleTimer(request):
             return JsonResponse({'isSuccessful': False})
         data_handler.send_current_game_state(game_state)
         return JsonResponse({'isSuccessful': True, 'state': data_handler.get_current_game_state_as_dict()})
-
-@csrf_exempt
-def toggleDisplayTimer(request):
-    """ Assigns a point value to a given fast money answer using the answer ID . """
-    if request.method == 'POST':
-        display_timer = request.POST['displayTimer']
-        
-        data_response = data_handler.toggleDisplayTimer(display_timer)
-
-        if data_response['isSuccessful']:
-            data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
-        return setJsonResponse(data_response)
 
 @csrf_exempt
 def toggleFastMoney(request):
