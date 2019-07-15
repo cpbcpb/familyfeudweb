@@ -68,7 +68,7 @@
                     <button v-on:click="awardPoints('one')" class="btn btn-primary">Award Team 1 Points</button>
                     <button v-on:click="awardPoints('two')" class="btn btn-primary">Award Team 2 Points</button>
                     <table class='answers-table'>
-                        <tr v-for="index in 4">
+                        <tr v-for="(value,index) in 4">
                             <td class="answer-text">
                                 <p>[[ getAnswerInfo(index, 'answer_text') ]]</p>
                                 <button class="btn btn-success display" v-if="!getAnswerInfo(index, 'currently_displayed') && getAnswerInfo(index, 'currently_displayed') !== ''" v-on:click="displayAnswer(getAnswerInfo(index, 'id'))">Display it!</button>
@@ -113,6 +113,9 @@
                 <button v-if="state.is_fast_money" v-on:click="toggleFastMoney('0')" class="btn btn-primary">Go back to the Normal Rounds</button><br>
                 <button v-if="!state.is_fast_money" v-on:click="toggleFastMoney('1')" class="btn btn-primary">Start Fast Money</button>
             </div>
+
+            <!-- Fast Money Section -->
+
             <div class="fast-money" v-if="state.is_fast_money">
                 <h2>Fast Money</h2>
                 <button v-on:click="revealBoard" v-if="state.display_logo" class="btn btn-success"> Reveal Board! </button>
@@ -121,10 +124,13 @@
                 <h3>Timer</h3>
                 <input type="number" v-model="state.fast_money.timer"><br><br>
                 <button v-on:click="setTimer" class="btn btn-primary">Set Timer</button>
+                <button v-on:click="toggleDisplayTimer('1')" v-if="!state.fast_money.display_timer" class="btn btn-primary"> Show Timer</button>
+                <button v-on:click="toggleDisplayTimer('0')" v-if="state.fast_money.display_timer" class="btn btn-primary"> Hide Timer</button>
                 <button v-on:click="toggleTimer('1')" class="btn btn-success">Start Timer</button>
                 <button v-on:click="toggleTimer('0')" class="btn btn-danger">Stop Timer</button>
                 <br><br>
                 <div class="center-container">
+                    <!-- Player 1 Fast Money -->
                     <div v-if="currentPlayer == 1">
                         <h4>Player 1</h4>
                         <button v-on:click="swapCurrentPlayer(2)" class="btn btn-primary"> Swap to Player 2 </button><br><br>
@@ -148,6 +154,7 @@
                             </tr>                                                                                      
                         </table>
                     </div>
+                    <!-- Player 2 Fast Money-->
                     <div v-if="currentPlayer == 2">
                         <p class="alert alert-warning">The board has automatically been hidden. Make sure to reveal it once the player is facing away from the board.</p>
                         <h4>Player 2</h4>
@@ -443,6 +450,19 @@
                 axios({
                     method: 'post',
                     url: '/base/admin/toggleTimer/',
+                    data: formData
+                }).then(function (response) {
+                    if (response['data']['isSuccessful']) {
+                        app.state = response['data']['state']
+                    }
+                })
+            },
+            toggleDisplayTimer: function(displayTimer) {
+                var formData = new FormData();
+                formData.set('displayTimer', displayTimer)
+                axios({
+                    method: 'post',
+                    url: '/base/admin/toggleDisplayTimer/',
                     data: formData
                 }).then(function (response) {
                     if (response['data']['isSuccessful']) {

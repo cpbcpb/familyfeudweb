@@ -23,5 +23,6 @@ urlpatterns = [
     url(r'^admin/toggleFastMoneyValue/$', views.toggleFastMoneyValue, name='toggleFastMoneyValue'),
     url(r'^admin/toggleTimer/$', views.toggleTimer, name='toggleTimer'),
     url(r'^admin/setTimer/$', views.setTimer, name='setTimer'),
+    url(r'^admin/toggleDisplayTimer/$', views.toggleDisplayTimer, name='toggleDisplayTimer'),
     url(r'^admin/toggleFastMoney/$', views.toggleFastMoney, name='toggleFastMoney'),
 ]
