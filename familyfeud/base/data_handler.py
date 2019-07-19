@@ -62,6 +62,8 @@ def get_current_game_state_as_dict():
     return {
         'team_1_score': current_game_status.team_1_score,
         'team_2_score': current_game_status.team_2_score,
+        'team_1_name': current_game_status.team_1_name,
+        'team_2_name': current_game_status.team_2_name,
         'question_total': current_game_status.question_total,
         'total_wrong': current_game_status.question_total_wrong,
         'current_game_id': current_game_status.current_game_id,
@@ -93,7 +95,7 @@ def sumAnswerTotals(answers):
         total += answer['point_value']
     return total
 
-def createNewGame(question_set):
+def createNewGame(question_set, team_1_name, team_2_name):
     try: 
         current_game = QuestionSet.objects.get(pk=question_set)
         new_game_status = GameStatus.objects.create(current_game=current_game)
@@ -101,6 +103,8 @@ def createNewGame(question_set):
         last_question = Question.objects.filter(Q(game=current_game) & Q(is_fast_money=False)).order_by('-question_order')[0]
         new_game_status.current_question = first_question
         new_game_status.last_question = last_question
+        new_game_status.team_1_name = team_1_name
+        new_game_status.team_2_name = team_2_name
         new_game_status.save()
         fast_money_questions = Question.objects.filter(Q(game=current_game) & Q(is_fast_money=True))
         for question in fast_money_questions:

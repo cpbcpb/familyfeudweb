@@ -1,1 +1,2 @@
 ./familyfeud/base/migrations/
+*.pyc

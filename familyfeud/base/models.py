@@ -28,6 +28,8 @@ class GameStatus(models.Model):
     current_game = models.ForeignKey(QuestionSet, on_delete=models.CASCADE, null=True, blank=True)
     team_1_score = models.IntegerField(default=0)
     team_2_score = models.IntegerField(default=0)
+    team_1_name = models.CharField(default='Team 1', max_length=500)
+    team_2_name = models.CharField(default='Team 2', max_length=500)
     current_question = models.ForeignKey(Question, on_delete=models.CASCADE, null=True, blank=True)
     question_total = models.IntegerField(default=0)
     question_total_wrong = models.IntegerField(default=0)

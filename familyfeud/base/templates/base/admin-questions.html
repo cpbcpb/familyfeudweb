@@ -12,12 +12,14 @@
 <body>
     <div id="app">
         <div class="newGameSectionWrapper">
-            <div class="newGameSection">
+            <div class="newGameSection  white-container">
                 <h2>Start New Game</h2>
                 <select class="form-control" v-model="gameToStart">
                     <option value="0" disabled>Select a Question Set</option>
                     <option v-for="question_set in question_sets" v-bind:value="question_set.id">[[question_set.friendly_name]]</option>
                 </select><br>
+                <label for="">Team 1 Name:</label><input v-model="team1New" type="text"><br>
+                <label for="">Team 2 Name:</label><input v-model="team2New" type="text"><br>
                 <p v-if="startNewGameError" class="alert alert-danger">[[startNewGameError]]</p>
                 <button type="button" class="btn btn-primary" v-on:click="showNewGameModal">
                 Start New Game
@@ -50,9 +52,9 @@
             <div v-if="!state.is_fast_money" class="normalRound">
                 <div class="scores">
                     <h3>Scores</h3>
-                    <h4>Team 1: [[ state.team_1_score ]]</h4>
-                    <h4>Team 2: [[ state.team_2_score ]]</h4>
-                    <button v-on:click="revealEditScore" class="btn btn-primary">Manually Edit Scores</button><br>
+                    <h4>[[state.team_1_name]]: [[ state.team_1_score ]]</h4>
+                    <h4>[[state.team_2_name]]: [[ state.team_2_score ]]</h4>
+                    <button v-on:click="revealEditScore" class="btn btn-primary">Manually Edit Scores</button><br><br>
                     <div v-if="showEditScore" class="edit-scores">
                         <label for="team_1_score">Team 1: </label><input class="form-control-inline" type="number" v-model="editTeam1"><br>
                         <label for="team_2_score">Team 2: </label><input class="form-control-inline" type="number" v-model="editTeam2"><br>
@@ -60,7 +62,7 @@
                         <button v-on:click="showEditScore = false" class="btn btn-danger">Cancel</button>
                     </div>
                 </div>
-                <div class="question-info">
+                <div class="question-info white-container">
                     <button v-on:click="revealBoard" v-if="state.display_logo" class="btn btn-success"> Reveal Board! </button>
                     <button v-on:click="hideBoard" v-if="!state.display_logo" class="btn btn-danger"> Hide Board </button>
                     <h3>Current Question: [[state.current_question.question_text]]</h3>
@@ -131,7 +133,7 @@
                 <br><br>
                 <div class="center-container">
                     <!-- Player 1 Fast Money -->
-                    <div v-if="currentPlayer == 1">
+                    <div class="white-container" v-if="currentPlayer == 1">
                         <h4>Player 1</h4>
                         <button v-on:click="swapCurrentPlayer(2)" class="btn btn-primary"> Swap to Player 2 </button><br><br>
                         <table class="fm-table">
@@ -152,10 +154,10 @@
                                     <button v-if="question['player_1_answer'].display_value" v-on:click="toggleFastMoneyValue(question.id, 1, '0')" class="btn btn-danger">Hide Point Value</button>
                                 </td>
                             </tr>                                                                                      
-                        </table>
+                        </table><br>
                     </div>
                     <!-- Player 2 Fast Money-->
-                    <div v-if="currentPlayer == 2">
+                    <div class="white-container" v-if="currentPlayer == 2">
                         <p class="alert alert-warning">The board has automatically been hidden. Make sure to reveal it once the player is facing away from the board.</p>
                         <h4>Player 2</h4>
                         <button v-on:click="swapCurrentPlayer(1)" class="btn btn-primary"> Swap to Player 1 </button><br><br>
@@ -178,7 +180,7 @@
                                     <button v-if="question['player_2_answer'].display_value" v-on:click="toggleFastMoneyValue(question.id, 2, '0')" class="btn btn-danger">Hide Point Value</button>
                                 </td>
                             </tr>                                                                                            
-                        </table>
+                        </table><br>
                     </div>
                 </div>
             </div>
@@ -219,12 +221,16 @@
             player1Answers:{},
             player2Answers:{},
             showModal: true,
-            currentPlayer: 1
+            currentPlayer: 1,
+            team1New: 'Team 1',
+            team2New: 'Team 2'
         },
         methods: {
             showNewGameModal: function (){
                 if (this.gameToStart == 0) {
                     this.startNewGameError = 'You must select a valid question set.';
+                } else if (this.team1New == '' || this.team2New == '') {
+                    this.startNewGameError = 'Please supply names for the teams.'
                 } else {
                     this.startNewGameError = '';
                     $('#confirmNewGame').modal();
@@ -303,7 +309,9 @@
             },
             createNewGame: function(gameId) {
                 var formData = new FormData()
-                formData.set('game', gameId)
+                formData.set('game', gameId);
+                formData.set('team1Name', this.team1New);
+                formData.set('team2Name', this.team2New);
                 axios({
                     method: 'post',
                     url: '/base/admin/createGame/',
