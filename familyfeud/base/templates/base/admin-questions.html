@@ -108,12 +108,12 @@
                     </div>
                     <br>
                     <button v-if="state.current_question.id != state.last_question.id" v-on:click="nextQuestion" class="btn btn-primary">Go to the Next Question!</button>
-                    <p v-if="state.current_question.id == state.last_question.id"><b>Last Question Reached. Start Fast Money Next.</b></p>
+                    <p v-if="state.current_question.id == state.last_question.id"><b>Last Question Reached. <template v-if="state.fast_money.questions.length > 0"> Start Fast Money Next. </template></b></p>
                 </div>
             </div>
             <div class="center-container">
-                <button v-if="state.is_fast_money" v-on:click="toggleFastMoney('0')" class="btn btn-primary">Go back to the Normal Rounds</button><br>
-                <button v-if="!state.is_fast_money" v-on:click="toggleFastMoney('1')" class="btn btn-primary">Start Fast Money</button>
+                <button v-if="state.is_fast_money && Object.keys(state.last_question).length != 0" v-on:click="toggleFastMoney('0')" class="btn btn-primary">Go back to the Normal Rounds</button><br>
+                <button v-if="!state.is_fast_money && state.fast_money.questions.length != 0" v-on:click="toggleFastMoney('1')" class="btn btn-primary">Start Fast Money</button>
             </div>
 
             <!-- Fast Money Section -->
@@ -183,14 +183,16 @@
                             <tr v-for="question in state.fast_money.questions">
                                 <td class="fm-question">[[question.text]]</td>
                                 <td>
-                                    <p>[[question['player_1_answer'].answer_text]] - [[question['player_1_answer'].point_value]]</p>
+                                    <p v-if="question['player_1_answer'].answer_text"><b>[[question['player_1_answer'].answer_text]]</b> - [[question['player_1_answer'].point_value]]</p>
+                                    <p v-if="!question['player_1_answer'].answer_text"><i>No answer provided</i> - [[question['player_1_answer'].point_value]]</p>
                                     <button v-if="!question['player_1_answer'].display_answer" v-on:click="toggleFastMoneyAnswer(question.id, 1, '1')" class="btn btn-success">Display User Answer</button>
                                     <button v-if="question['player_1_answer'].display_answer" v-on:click="toggleFastMoneyAnswer(question.id, 1, '0')" class="btn btn-danger">Hide User Answer</button>
                                     <button v-if="!question['player_1_answer'].display_value" v-on:click="toggleFastMoneyValue(question.id, 1, '1')" class="btn btn-success">Display Point Value</button>
                                     <button v-if="question['player_1_answer'].display_value" v-on:click="toggleFastMoneyValue(question.id, 1, '0')" class="btn btn-danger">Hide Point Value</button>
                                 </td>
                                 <td>
-                                    <p>[[question['player_2_answer'].answer_text]] - [[question['player_2_answer'].point_value]]</p>
+                                    <p v-if="question['player_2_answer'].answer_text"><b>[[question['player_2_answer'].answer_text]]</b> - [[question['player_2_answer'].point_value]]</p>
+                                    <p v-if="!question['player_2_answer'].answer_text"><i>No answer provided</i> - [[question['player_2_answer'].point_value]]</p>
                                     <button v-if="!question['player_2_answer'].display_answer" v-on:click="toggleFastMoneyAnswer(question.id, 2, '1')" class="btn btn-success">Display User Answer</button>
                                     <button v-if="question['player_2_answer'].display_answer" v-on:click="toggleFastMoneyAnswer(question.id, 2, '0')" class="btn btn-danger">Hide User Answer</button>
                                     <button v-if="!question['player_2_answer'].display_value" v-on:click="toggleFastMoneyValue(question.id, 2, '1')" class="btn btn-success">Display Point Value</button>
@@ -215,6 +217,7 @@
     axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
     question_set_list = {{question_sets}}
     state = {{state}}
+    console.log(state)
     fast_money_answers = {{fast_money_answers}}
 
     if (!state.no_active_game) {
