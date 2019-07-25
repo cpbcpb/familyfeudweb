@@ -24,19 +24,8 @@ def get_current_game_state_as_dict():
     current_game_status = getCurrentGameStatus()
     if current_game_status == {}:
         return {
-            'team_1_score': 0,
-            'team_2_score': 0,
-            'question_total': 0,
-            'total_wrong': 0,
-            'current_game_id': 0,
-            'current_question_id': 0,
-            'current_question': {},
-            'create_date': '',
             'display_logo': False,
-            'current_answers': [],
-            'show_single_x': False,
-            'show_total_wrong': False,
-            'no_active_game': True,
+            'no_active_game': True
         }
     current_answers = list(Answer.objects.filter(question_id=current_game_status.current_question_id).order_by('-point_value').values())
     displayed_answers = list(current_game_status.displayed_answers.values())
@@ -58,7 +47,10 @@ def get_current_game_state_as_dict():
             'player_2_answer': FastMoneyAnswer.objects.filter(Q(game_status=current_game_status) & Q(question=question) & Q(player=2)).values()[0]
         }
         questions.append(fast_money_question)
-
+    
+    current_question = model_to_dict(current_game_status.current_question) if current_game_status.current_question else {}
+    last_question = model_to_dict(current_game_status.last_question) if current_game_status.last_question else {}
+    
     return {
         'team_1_score': current_game_status.team_1_score,
         'team_2_score': current_game_status.team_2_score,
@@ -68,8 +60,8 @@ def get_current_game_state_as_dict():
         'total_wrong': current_game_status.question_total_wrong,
         'current_game_id': current_game_status.current_game_id,
         'current_question_id': current_game_status.current_question_id,
-        'current_question': model_to_dict(current_game_status.current_question),
-        'last_question': model_to_dict(current_game_status.last_question),
+        'current_question': current_question,
+        'last_question': last_question,
         'create_date': current_game_status.create_date.__str__(),
         'display_logo': current_game_status.display_logo,
         'current_answers': current_answers,
@@ -99,10 +91,12 @@ def createNewGame(question_set, team_1_name, team_2_name):
     try: 
         current_game = QuestionSet.objects.get(pk=question_set)
         new_game_status = GameStatus.objects.create(current_game=current_game)
-        first_question = Question.objects.filter(Q(game=current_game) & Q(is_fast_money=False)).order_by('question_order')[0] # Get the first question in the seleced game
-        last_question = Question.objects.filter(Q(game=current_game) & Q(is_fast_money=False)).order_by('-question_order')[0]
-        new_game_status.current_question = first_question
-        new_game_status.last_question = last_question
+        questions_ordered = Question.objects.filter(Q(game=current_game) & Q(is_fast_money=False)).order_by('question_order')
+        if not questions_ordered:
+            new_game_status.is_fast_money = True
+        else:
+            new_game_status.current_question = questions_ordered.first()
+            new_game_status.last_question = questions_ordered.last()
         new_game_status.team_1_name = team_1_name
         new_game_status.team_2_name = team_2_name
         new_game_status.save()
@@ -313,6 +307,7 @@ def toggleFastMoney(start_fast_money):
             currentGameStatus.display_logo = True
         else:
             currentGameStatus.is_fast_money = False
+            currentGameStatus.display_logo = True
         currentGameStatus.save()
     except Exception as e:
         print(e)
