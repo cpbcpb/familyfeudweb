@@ -191,6 +191,13 @@
                         </div>
                     </div>
                 </div>
+            <timer
+                v-bind:timer="state.fast_money.timer"
+                v-bind:display_timer="state.fast_money.display_timer"
+                v-bind:start_timer="state.fast_money.start_timer"
+                v-bind:stop_timer="state.fast_money.stop_timer"
+            >
+            </timer>
             </div>
         </div>
     </div>
@@ -215,6 +222,45 @@
                 <img v-show="total_wrong>2 && !show_single_x" class="col-4" src="{% static 'base/strike.png' %}" alt="strike">
             </div>
         `
+    })
+    Vue.component('timer', {
+        delimiters:['[[', ']]'],
+        data: function(){
+            return {
+                time_remaining: "",
+                //set the timer's interval here so that it can be cleared each time it is reset.
+                interval: null,
+            }
+        },
+        //In the dom these must be refered to in kebab case number-wrong, show-x, show-one-x.
+        props: ['timer', 'display_timer', 'start_timer', 'stop_timer'],
+        template:
+        `
+            <div class="timer" v-show="display_timer">
+                [[time_remaining]]
+            </div>
+        `,
+        watch: {
+            start_timer: function(){//this triggers whenever start_timer changes
+                if(this.start_timer === true){
+                    //Clear the interval so timer will work properly if stopped and started multiple times.
+                    clearInterval(this.interval)
+                    //Set time_remaining.
+                    this.time_remaining=this.timer;
+                    //To use component scope inside the set interval function.
+                    const self = this;
+                    this.interval = setInterval(function(){
+                        if(self.time_remaining > 0 && !self.stop_timer){
+                            self.time_remaining--;
+                        }
+                        else{
+                            clearInterval(self.interval);
+                            self.interval=null;
+                        }
+                    },1000)
+                }
+            },
+        }
     })
     var app = new Vue({
         delimiters: ['[[', ']]'],
@@ -575,6 +621,18 @@
         width: 60px; 
         height: 40px;
     }
+    .timer {
+        width: 200px;
+        height: 150px;
+        background-color:darkblue;
+        color:white;
+        border-style: solid;
+        border-color: grey;
+        border-radius: 50%;
+        font-size: 100px;
+        font-weight: bold;
+        text-align: center;
+    }
     .strikes {
         position: fixed;
         display: flex;
@@ -615,7 +673,11 @@
         flex-direction: row;
         transform: rotateX(180deg);
     }
-
+    #fast-money-game {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
     .fast-money-grid {
         display: flex;
         flex-direction: row;
