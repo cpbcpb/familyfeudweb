@@ -1,3 +1,6 @@
+body {
+    background-color: #E9E8E8;
+}
 td {
     border: 1px solid #D1D1D1;
     padding: 10px;
@@ -9,6 +12,12 @@ td {
 
 .answer-group {
     background-color: black !important;
+}
+
+.white-container {
+    background-color: white;
+    border: 1.5px solid black;
+    border-radius: 5px;
 }
 
 .half-row {
@@ -37,7 +46,6 @@ td {
 }
 
 .newGameSection {
-    border: 3px solid black;
     border-radius:5px;
     display: inline-block;
     text-align: center;
@@ -54,7 +62,6 @@ td {
 
 .question-info {
     text-align: center;
-    border: 3px solid black;
     border-radius:5px;
     padding: 10px 0;
 }
@@ -128,7 +135,9 @@ td {
 }
 
 .fm-table {
-    width: 100%;
+    width: 98%;
+    margin: 10px;
+
 }
 
 .fm-question {
