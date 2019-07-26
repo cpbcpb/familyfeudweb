@@ -73,7 +73,15 @@ def createNewGame(request):
         data_response = data_handler.createNewGame(request.POST['game'], request.POST['team1Name'], request.POST['team2Name'])
         if data_response['isSuccessful']:
             data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
-        return setJsonResponse(data_response)
+   
+        current_game_status = data_handler.getCurrentGameStatus()
+        fast_money_answers = {}
+        fast_money_questions = list(Question.objects.filter(Q(game=current_game_status.current_game) & Q(is_fast_money=True)).values().order_by('question_order'))
+        for question in fast_money_questions:
+            fast_money_answers[question['id']] = list(Answer.objects.filter(question_id=question['id']).order_by('-point_value').values())
+
+        json_response = {'isSuccessful': True, 'state': data_handler.get_current_game_state_as_dict(), 'fastMoneyAnswers': fast_money_answers}
+        return JsonResponse(json_response)
 
 @csrf_exempt
 def nextQuestion(request):
