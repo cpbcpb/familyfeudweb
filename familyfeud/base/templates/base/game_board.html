@@ -12,7 +12,7 @@
 <body>
 <div id="app">
     <div id="game-background">
-        <div class="logo-oval"v-show="state.display_logo">
+        <div class="logo-oval" v-show="state.display_logo">
             <div class="logo-text-box" >
                 <div>
                     <span class="first-letter" data-text="C">C</span>
@@ -32,7 +32,6 @@
             <div id="regular-game" v-if="!state.is_fast_money && !state.display_logo">
                 <div id="score-top" class="score">
                     <span v-show="!state.points_awarded">[[state.question_total]]</span>
-    
                 </div>
                 <div id="team-scores-and-board">
                     <div id="score-left" class="score">
@@ -46,7 +45,7 @@
                                     <div class="number">1</div>
                                 </div>
                                 <div class="flip-card-back">
-                                    <div class="answer-text" v-bind:class="{short : sortedAnswers[0].answer_text.length<11}" >[[sortedAnswers[0].answer_text]]</div>
+                                    <div class="answer-text" v-bind:class="{short : sortedAnswers[0].answer_text.length<8}" >[[sortedAnswers[0].answer_text]]</div>
                                     <div class="answer-points">[[sortedAnswers[0].point_value]]</div>
                                 </div>
                             </div>
@@ -59,7 +58,7 @@
                                     <div class="number">2</div>
                                 </div>
                                 <div class="flip-card-back">
-                                    <div class="answer-text" v-bind:class="{short : sortedAnswers[1].answer_text.length<11}">[[sortedAnswers[1].answer_text]]</div>
+                                    <div class="answer-text" v-bind:class="{short : sortedAnswers[1].answer_text.length<8}">[[sortedAnswers[1].answer_text]]</div>
                                     <div class="answer-points">[[sortedAnswers[1].point_value]]</div>
                                 </div>
                             </div>
@@ -72,7 +71,7 @@
                                         <div class="number">3</div>
                                     </div>
                                     <div class="flip-card-back">
-                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[2].answer_text.length<11}">[[sortedAnswers[2].answer_text]]</div>
+                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[2].answer_text.length<8}">[[sortedAnswers[2].answer_text]]</div>
                                             <div class="answer-points">[[sortedAnswers[2].point_value]]</div>
                                     </div>
                                 </div>
@@ -85,7 +84,7 @@
                                         <div class="number">4</div>
                                     </div>
                                     <div class="flip-card-back">
-                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[3].answer_text.length<11}">[[sortedAnswers[3].answer_text]]</div>
+                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[3].answer_text.length<8}">[[sortedAnswers[3].answer_text]]</div>
                                             <div class="answer-points">[[sortedAnswers[3].point_value]]</div>
                                     </div>
                                 </div>
@@ -100,7 +99,7 @@
                                         <div class="number">5</div>
                                     </div>
                                     <div class="flip-card-back">
-                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[4].answer_text.length<11}">[[sortedAnswers[4].answer_text]]</div>
+                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[4].answer_text.length<8}">[[sortedAnswers[4].answer_text]]</div>
                                             <div class="answer-points">[[sortedAnswers[4].point_value]]</div>
                                     </div>
                                 </div>
@@ -113,7 +112,7 @@
                                         <div class="number">6</div>
                                     </div>
                                     <div class="flip-card-back">
-                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[5].answer_text.length<11}">[[sortedAnswers[5].answer_text]]</div>
+                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[5].answer_text.length<8}">[[sortedAnswers[5].answer_text]]</div>
                                             <div class="answer-points">[[sortedAnswers[5].point_value]]</div>
                                     </div>
                                 </div>
@@ -126,7 +125,7 @@
                                         <div class="number">7</div>
                                     </div>
                                     <div class="flip-card-back">
-                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[6].answer_text.length<11}">[[sortedAnswers[6].answer_text]]</div>
+                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[6].answer_text.length<8}">[[sortedAnswers[6].answer_text]]</div>
                                             <div class="answer-points">[[sortedAnswers[6].point_value]]</div>
                                     </div>
                                 </div>
@@ -139,7 +138,7 @@
                                         <div class="number">8</div>
                                     </div>
                                     <div class="flip-card-back">
-                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[7].answer_text.length<11}">[[sortedAnswers[7].answer_text]]</div>
+                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[7].answer_text.length<8}">[[sortedAnswers[7].answer_text]]</div>
                                             <div class="answer-points">[[sortedAnswers[7].point_value]]</div>
                                     </div>
                                 </div>
@@ -166,12 +165,15 @@
                                 <span v-if="question.player_1_answer.display_answer" class="fm-typing">[[question.player_1_answer.answer_text]]</span>
                             </div>
                             <div class="fm-box fm-points-box">
+
+                            {% comment %} <div class="blinky" v-show="question.player_1_answer.display_answer && !question.player_1_answer.display_value"></div>
+                             {% endcomment %}
                             <span v-show="question.player_1_answer.display_value">[[question.player_1_answer.point_value]]</span>
                             </div>
                         </div>
                         <div id="total-row" class="fm-row">
                             <div id= "fm-total" class="fm-box">
-                            <div> TOTAL</div><div>[[fastMoneyTotal]]</div>
+                            <div> TOTAL</div><div>[[fastMoneyPlayer1Total]]</div>
                             </div>
                         </div>
                     </div>
@@ -181,12 +183,15 @@
                             <span v-if="question.player_2_answer.display_answer" class="fm-typing" >[[question.player_2_answer.answer_text]]</span>
                             </div>
                             <div class="fm-box fm-points-box">
+
+                              {% comment %} <div class="blinky" v-show="question.player_2_answer.display_answer && !question.player_2_answer.display_value"></div> {% endcomment %}
+
                             <span v-show="question.player_2_answer.display_value">[[question.player_2_answer.point_value]]</span>
                             </div>
                         </div>
-                        <div id="total-row" class="fm-row">
-                            <div id= "fm-total" >
-                        
+                         <div id="total-row" class="fm-row">
+                            <div id= "fm-total" class="fm-box">
+                            <div> TOTAL</div><div>[[fastMoneyPlayer2Total]]</div>
                             </div>
                         </div>
                     </div>
@@ -252,6 +257,9 @@
                     this.interval = setInterval(function(){
                         if(self.time_remaining > 0 && !self.stop_timer){
                             self.time_remaining--;
+                            if(self.time_remaining === 0){
+                                app.playSound(app.fmOutOfTime, 800);
+                            }
                         }
                         else{
                             clearInterval(self.interval);
@@ -273,8 +281,13 @@
             buzz: new Audio('{% static 'base/buzz.mp3' %}'),
             //Ding is the sound that plays when an answer is revealed.
             ding: new Audio('{% static 'base/belldesk.mp3' %}'),
-            state: {display_logo: true
-            },
+            //fast money reveal answer
+            firstDisplayBoardRattle: new Audio('{% static 'base/belldesk.mp3' %}'),
+            fmRevealText: new Audio('{% static 'base/belldesk.mp3' %}'),
+            fmRevealPoints: new Audio('{% static 'base/belldesk.mp3' %}'),
+            fmRevealZero: new Audio('{% static 'base/buzz.mp3' %}'),
+            fmOutOfTime: new Audio('{% static 'base/buzz.mp3' %}'),
+            state: {display_logo: true},
         },
         methods: {
             receiveMessage: function (e) {
@@ -284,8 +297,6 @@
             },
             showX : function () {
                 let timeToShowX = 800;
-                let xInterval;
-                clearTimeout(xInterval);
                 if( this.state.show_single_x || 
                 (this.state.show_total_wrong == true && this.state.total_wrong>0) ) {
                     this.buzz.play();
@@ -298,6 +309,16 @@
                         app.state.show_total_wrong = false;
                     }, timeToShowX);
                 }
+            },
+            //Use the sound instance name from the data object
+            playSound: function(sound, duration){
+                sound.play();
+                    let interval = setTimeout(function(){
+                    //stops sound before end of recording.
+                    sound.pause();
+                    //tells sound to reset to begining of mp3.
+                    sound.currentTime = 0;
+                    }, duration);
             }
         },
         computed: {
@@ -336,14 +357,23 @@
                     return arraySorted
                 }
             },
-            fastMoneyTotal : function(){
+            fastMoneyPlayer1Total : function(){
                 if(this.state.is_fast_money){
                     let total = 0;
 
                     this.state.fast_money.questions.forEach(function(question){
                         if(question.player_1_answer.display_value){
                             total += question.player_1_answer.point_value;
-                        }
+                        }       
+                    })
+                    return total;
+                }
+            },
+            fastMoneyPlayer2Total : function(){
+                if(this.state.is_fast_money){
+                    let total = 0;
+
+                    this.state.fast_money.questions.forEach(function(question){
                         if(question.player_2_answer.display_value){
                             total += question.player_2_answer.point_value;
                         }
@@ -363,13 +393,37 @@
                     //sortedAnswers but this is the only expected change scenario)
                     for( i = 0; i < newAnswers.length; i++){
                         if(newAnswers[i].currently_displayed===true && oldAnswers[i].currently_displayed===false){
-                            this.ding.play();
-                            let interval = setTimeout(function(){
-                            //stops sound before end of recording.
-                            app.ding.pause();
-                            //tells sound to reset to begining of mp3.
-                            app.ding.currentTime = 0;
-                            }, 1040);
+                            app.playSound(app.ding, 1040)
+                        }
+                    }
+                }
+            },
+            sortedFastMoneyQuestions: function(newQuestions, oldQuestions){
+                if(typeof oldQuestions !== "undefined"){
+                    for(i=0; i<newQuestions.length; i++){
+                        //play sound on reveal player 1 or player 2 answer text
+                        if(
+                            (newQuestions[i].player_1_answer.display_answer===true && oldQuestions[i].player_1_answer.display_answer===false) ||
+                            (newQuestions[i].player_2_answer.display_answer===true && oldQuestions[i].player_2_answer.display_answer===false)
+                        ){
+                            app.playSound(app.fmRevealText,1040)
+                        }
+                        //play sound on reveal player 1 or 2 points
+                        else if(newQuestions[i].player_1_answer.display_value===true && oldQuestions[i].player_1_answer.display_value===false){
+                            if(newQuestions[i].player_1_answer.point_value === 0){
+                                app.playSound(app.fmRevealZero, 800)
+                            }
+                            else if(newQuestions[i].player_1_answer.point_value>0){
+                                app.playSound(app.fmRevealPoints, 1040)
+                            }
+                        }
+                        else if(newQuestions[i].player_2_answer.display_value===true && oldQuestions[i].player_2_answer.display_value===false){
+                            if(newQuestions[i].player_2_answer.point_value===0){
+                                app.playSound(app.fmRevealZero, 800)
+                            }
+                            else if(newQuestions[i].player_2_answer.point_value>0){
+                                app.playSound(app.fmRevealPoints, 1040)
+                            }
                         }
                     }
                 }
@@ -399,6 +453,7 @@
     #app {
         display: flex;
         flex-direction: column;
+        position: fixed;
         justify-content: center;
         align-items: center;
         height: 100vh;
@@ -497,31 +552,33 @@
  #game-background {
         display: flex;
         flex-direction: column;
-        justify-content: flex-end;
+        justify-content: center;
         align-items: center;
-        width: 1554px;
-        height: 821px;
+        width: 800px;
+        height: 600px;
+        background-color:green;
+        {% comment %} 
         background-image: url('{% static 'base/background.png' %}');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
- 
+  {% endcomment %}
     } 
     #regular-game {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: 100%;
-        margin-bottom:530px;
-        width: 1100px;
+        height:600px;
+        width: 800px;
+        background-color:yellow;
     }
 
     #team-scores-and-board {
         display: flex;
         flex-direction: row;
         justify-content: center;
-        align-content: center;
+        align-items: center;
     }
     .score {
         display: flex;
@@ -533,46 +590,41 @@
         font-size: 55px;
         font-weight: bold;
         text-shadow: 2px 2px black;
+        background-color:darkblue;
     }
     #score-top {
-        padding-bottom: 20px;
     }
     #score-left {
         float: left;
-        padding-right: 70px;
-        padding-bottom:40px;
     }
     #score-right {
         float: right;
-        padding-left: 70px;
-        padding-bottom: 40px;
     }
     .game-grid {
-        width: 480px;
-        height: 300px;
+        width: 650px;
+        height: 360px;
         display: flex;
         background-color:black;
         flex-direction: row;
         justify-content: space-evenly;
-        border-color: orange;
-        border-style: solid;
-        border-radius: 20px;
-        border-width: 5px;
+        border-radius: 9px;
     }
     .game-column {
         display: flex;
         flex-direction: column;
-        justify-content: space-evenly;
-        align-content: center;
-        width: 48%;
+        justify-content: space-between;
+        align-items: center;
+        width: 317px;
     }
     .answer-box {
+        margin-top: 4px;
+        margin-bottom: 4px;
         background-image: radial-gradient(lightblue, dodgerblue, blue);
         border-style: double;
         border-color: lightgrey;
         border-width: 10px;
         width: 100%;
-        height: 60px;
+        height: 79px;
         perspective: 1000px;
     }
     .answer-text {
@@ -584,7 +636,7 @@
         color: white;
         text-transform: uppercase;
         text-shadow: 2px .5px #000000;
-        font-size: 20px;
+        font-size: 29px;
         background-image: linear-gradient(dodgerblue, blue, darkblue );
         height: 100%;
         width: 85%;
@@ -592,7 +644,7 @@
         overflow:hidden;
     }
     .short {
-        font-size:25px;
+        font-size:39px;
     }
     .answer-points {
         color: white;
@@ -602,7 +654,7 @@
         align-items: center;
         height: 100%;
         display: flex;
-        font-size: 22px;
+        font-size: 32px;
         text-align: center;
         font-weight: bold;
         width: 15%;
@@ -613,13 +665,13 @@
         border-style: solid;
         border-color: grey;
         border-radius: 50%;
-        font-size: 34px;
+        font-size: 48px;
         font-weight: bold;
         text-align: center;
         vertical-align: top;
         line-height: 1em;
-        width: 60px; 
-        height: 40px;
+        width: 68px; 
+        height: 55px;
     }
     .timer {
         width: 200px;
@@ -730,8 +782,21 @@
         justify-content: center;
         width: 20%;
         height: 100%;
-
     }
+
+    {% comment %} .blinky {
+        height: 100%;
+        width: 100%;
+        animation-delay: 1.5s;
+        animation: blink .8s infinite;
+    }
+    @keyframes blink {
+        0%{background-color: black}
+        45%{background-color: black}
+        55%{background-color: red}
+        90%{background-color: red}
+    } {% endcomment %}
+
     #fm-total {
         display: flex;
         flex-direction: row;
@@ -741,11 +806,10 @@
     }
 
     .fm-typing {
-
   white-space: nowrap;
   overflow: hidden;
   width: 30em;
-  animation: type 5s steps(60, end); 
+  animation: type 1.5s steps(60, end); 
 }
 
 @keyframes type{ 
