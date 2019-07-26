@@ -30,13 +30,19 @@
        {% endcomment %}
         <div v-if="!state.no_active_games">
             <div id="regular-game" v-if="!state.is_fast_money && !state.display_logo">
-                <div id="score-top" class="score">
-                    <span v-show="!state.points_awarded">[[state.question_total]]</span>
-                </div>
-                <div id="team-scores-and-board">
+                <div class="score-row">
                     <div id="score-left" class="score">
                         [[state.team_1_score]]
                     </div>
+                <div id="score-top" class="score">
+                    <span v-show="!state.points_awarded">[[state.question_total]]</span>
+                </div>
+                    <div  id="score-right" class="score" v-if="!state.display_logo">
+                        [[state.team_2_score]]
+                    </div>
+                </div>
+                <div id="outer-board">
+
                     <div class="game-grid">
                         <div class="game-column">
                         <div class="answer-box" v-if="sortedAnswers[0]"  v-bind:class="{flippy : sortedAnswers[0].currently_displayed}">
@@ -152,9 +158,7 @@
                             v-bind:show_single_x="state.show_single_x">
                         </strikes>
                     </div>
-                    <div  id="score-right" class="score" v-if="!state.display_logo">
-                        [[state.team_2_score]]
-                    </div>
+
                 </div>
             </div>
             <div id="fast-money-game" v-if="state.is_fast_money">
@@ -555,30 +559,38 @@
         justify-content: center;
         align-items: center;
         width: 800px;
-        height: 600px;
-        background-color:green;
-        {% comment %} 
-        background-image: url('{% static 'base/background.png' %}');
-        background-size: cover;
+        height: 600px;  
+        background-image: url('{% static 'base/croppedbg.jpg' %}');
+        background-size: 950px 600px;
         background-position: center;
         background-repeat: no-repeat;
-  {% endcomment %}
     } 
     #regular-game {
+        margin-top:50px;
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
         height:600px;
-        width: 800px;
-        background-color:yellow;
+        width: 1080px;
     }
 
-    #team-scores-and-board {
+    #outer-board {
+        margin-top:5px;
         display: flex;
         flex-direction: row;
         justify-content: center;
-        align-items: center;
+        align-items: flex-start;
+        width:1000px;
+        height:430px;
+
+    }
+    .score-row {
+        display: flex;
+        flex-direction: row;
+        width:100%;
+        justify-content:center;
+        align-items: flex-end;
     }
     .score {
         display: flex;
@@ -587,24 +599,44 @@
         align-content: center;
         align-items: center;
         color: white;
-        font-size: 55px;
         font-weight: bold;
         text-shadow: 2px 2px black;
-        background-color:darkblue;
+        padding:0px;
+        line-height:1em;
+        border-style:solid;
+        border-color:black;
+        background-color: blue;
+        border-width: 5px;
+        border-radius:10px;
+
     }
     #score-top {
+        width:190px;
+        padding: 18px 68px 20px 68px;
+        height: 130px;
+        font-size:65px;
     }
     #score-left {
-        float: left;
+        font-size:40px;
+        width:90px;
+        height:90px;
+        display: flex;
+        flex-direction: row;
+
     }
     #score-right {
-        float: right;
+        font-size:40px;
+        width:90px;
+        height:90px;
+        display: flex;
+        flex-direction: row;
     }
     .game-grid {
-        width: 650px;
-        height: 360px;
+        width: 640px;
+        height: 390px;
         display: flex;
         background-color:black;
+        border-radius:10px;
         flex-direction: row;
         justify-content: space-evenly;
         border-radius: 9px;
@@ -612,19 +644,17 @@
     .game-column {
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
+        justify-content: space-evenly;
         align-items: center;
-        width: 317px;
+        width: 310px;
     }
     .answer-box {
-        margin-top: 4px;
-        margin-bottom: 4px;
         background-image: radial-gradient(lightblue, dodgerblue, blue);
         border-style: double;
         border-color: lightgrey;
         border-width: 10px;
         width: 100%;
-        height: 79px;
+        height: 84px;
         perspective: 1000px;
     }
     .answer-text {
