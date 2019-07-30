@@ -521,26 +521,25 @@
         height: 100vh;
         width: 100vw;
         background-color:black;
-        {% comment %} background-image: url('{% static 'base/floodlights.jpg' %}'); {% endcomment %}
-        background-size: cover;
+        {% comment %} background-image: url('{% static 'base/floodlights.jpg' %}'); 
+        background-size: cover;{% endcomment %}
+
     }
 
     .logo-oval {
         display: flex;
         justify-content: center;
-        align-content: flex-start;
+        align-items: flex-start;
         width: 700px;
         height: 375px;
         border-radius: 700px / 375px;
-        border-style: solid;
-        border-color: #5d361b;
-        border-width: 15px;
+        border: 15px solid  #5d361b;
         position: relative;
         background-color: #a44704;
         z-index: 1;
         box-shadow: 
-        0 -6.25px 0px 0 dodgerblue,
-        12.5px 17.5px 12.5px black ;
+            0 -6.25px 0px 0 dodgerblue,
+            12.5px 17.5px 12.5px black ;
     }
     .logo-oval:before {
         background-image: radial-gradient(lightblue, darkblue),url('{% static 'base/logobg2.png' %}');
@@ -548,15 +547,13 @@
         background-size: 97%;
         content: "";
         display: block;
+        border: 5px solid lightcyan;
+        border-radius: 750px / 375px;
         position: absolute;
-        border-color:lightcyan;
-        border-style:solid;
-        border-width:5px;
         top: 1.25px;
         left: 1.25px;
         right: 1.25px;
         bottom: 1.25px;
-        border-radius: 750px / 375px;
         z-index: -2;
     }
 
@@ -566,30 +563,28 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        margin-top: -2px;
     }
     .logo-text-box div span {
-        font-size: 131px;
-        font-weight:900;
+        font: 900 131px/.75em Georgia, Times, "Times New Roman", serif;
+        vertical-align: 15px;
         -webkit-text-stroke: 2.5px #6c0400;
         paint-order:stroke fill;
         display: inline-block;
-        font-family: Georgia, Times, "Times New Roman", serif;
         background-image: -webkit-linear-gradient(#fc6006, #fef53e);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         position:relative;
-        line-height: .75em;
-        vertical-align: 15px;
     }
     .logo-text-box div span::after {
         display: inline-block;
         content: attr(data-text);
-        left: 0;
         position: absolute;
+        left: 0;
+        top: 0;
         text-shadow: 2.5px 2.5px 0 #bcbcbc, 8px 10px 6.5px black;
         -webkit-text-stroke: 6.25px #f7c6c9;
         paint-order: stroke fill;
-        top: 0;
         z-index: -1;
     }
     .first-letter {
@@ -598,8 +593,8 @@
     }
     .y {
         font-size: 155px !important;
-        vertical-align: 29px !important;
-        line-height: 1.08em !important;
+        vertical-align: 31px !important;
+        line-height: 1.15em !important;
     }
 
  #logo-background {
@@ -622,10 +617,7 @@
         align-items: center;
         width: 800px;
         height: 600px;  
-       background-image: url('{% static 'base/croppedbg2.jpg' %}');
-        background-size: 950px 600px;
-        background-position: center;
-        background-repeat: no-repeat;
+        background: url('{% static 'base/croppedbg2.jpg' %}') no-repeat center 950px 600px;
     } 
     #regular-game {
         margin-top:50px;
@@ -715,6 +707,8 @@
         width: 310px;
     }
 
+{% comment %} The following classes number1 through number8 make the transition animation 
+for the initial reveal of the game board in a regular round. {% endcomment %}
     .number1-enter{
         opacity: 0;
     }
