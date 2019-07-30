@@ -255,6 +255,17 @@
             </div>
         `,
         watch: {
+            display_timer: function(newBoolean, oldBoolean){
+                //plays a sound when new board is revealed in regular round
+                if( newBoolean === true && oldBoolean === false){
+                    let interval;
+                    if('this.timer>0'){
+                        this.time_remaining = this.timer
+                    }
+                    clearTimeout(interval);
+                    app.playSound(app.ding, 1040)
+                }
+            },
             start_timer: function(){//this triggers whenever start_timer changes
                 if(this.start_timer === true){
                     //Clear the interval so timer will work properly if stopped and started multiple times.
@@ -267,7 +278,7 @@
                         if(self.time_remaining > 0 && !self.stop_timer){
                             self.time_remaining--;
                             if(self.time_remaining === 0){
-                                app.playSound(app.fmOutOfTime, 800);
+                                app.playSound(app.timerFM, 1600);
                             }
                         }
                         else{
@@ -286,14 +297,28 @@
             displaySocket: new WebSocket(
                 'ws://' + window.location.host + '/ws/display_answer/'
             ),
+            //when logo is hidden and new board is shown in regular round.
+            boardRefresh: new Audio('{% static 'base/board-refresh.mp3' %}'),
+            strike: new Audio('{% static 'base/strike.mp3' %}'),
+            //regular round answer is revealed
+            reveal: new Audio('{% static 'base/reveal.mp3' %}'),
+            fmRevealText: new Audio('{% static 'base/fastmoney-showtext.mp3' %}'),
+
+
+            //These sounds will need to be done from soundboard when appropriate, are not automatic
+            //hand-buzzer
+            //stinger-win-game
+            //stinger-podium
+
+            //sounds below here to be replaced
             // Sound that plays with wrong answers.
-            buzz: new Audio('{% static 'base/buzz.mp3' %}'),
+            timerFM: new Audio('{% static 'base/timerFM.mp3' %}'),
             //Ding is the sound that plays when an answer is revealed.
             ding: new Audio('{% static 'base/belldesk.mp3' %}'),
             //fast money reveal answer
-            firstDisplayBoardRattle: new Audio('{% static 'base/belldesk.mp3' %}'),
-            fmRevealText: new Audio('{% static 'base/belldesk.mp3' %}'),
-            fmRevealPoints: new Audio('{% static 'base/belldesk.mp3' %}'),
+
+
+            fmRevealPoints: new Audio('{% static 'base/reveal-fastmoney.mp3' %}'),
             fmRevealZero: new Audio('{% static 'base/buzz.mp3' %}'),
             fmOutOfTime: new Audio('{% static 'base/buzz.mp3' %}'),
             state: {display_logo: true},
@@ -308,12 +333,12 @@
                 let timeToShowX = 800;
                 if( this.state.show_single_x || 
                 (this.state.show_total_wrong == true && this.state.total_wrong>0) ) {
-                    this.buzz.play();
+                    this.strike.play();
                     xInterval = setTimeout(function(){
                     //Stops showing X and stops playing sound.
-                        app.buzz.pause();
+                        app.strike.pause();
                         //tells sound to reset to begining of mp3.
-                        app.buzz.currentTime = 0;
+                        app.strike.currentTime = 0;
                         app.state.show_single_x = false;
                         app.state.show_total_wrong = false;
                     }, timeToShowX);
@@ -331,11 +356,12 @@
             }
         },
         computed: {
+            display_logo: function(){
+                return this.state.display_logo;
+            },
             sortedAnswers: function() {
-
                 //avoids errors during pageload
                 if(typeof this.state.current_answers !== "undefined"){
-
                     //sort answers by point value descending.
                     let arraySorted = this.state.current_answers.sort((a,b) => 
                     (a.point_value > b.point_value) ? -1 : 1 )
@@ -392,9 +418,17 @@
             }
         },
         watch: {
+            display_logo: function(newBoolean, oldBoolean){
+                //plays a sound when new board is revealed in regular round
+                if( newBoolean === false && oldBoolean === true && this.state.is_fast_money===false){
+                    let interval;
+                    clearTimeout(interval);
+                    app.playSound(app.boardRefresh, 1040)
+                }
+            },
+
             //Watching sorted answers to see if should reveal a newly displayed answer with flip animation and ding sound
             sortedAnswers: function(newAnswers, oldAnswers){
-                //This checks that this isn't the first load of sortedAnswers ever.
                 if(typeof oldAnswers !== "undefined"){
                     let interval;
                     clearTimeout(interval);
@@ -402,14 +436,14 @@
                     //sortedAnswers but this is the only expected change scenario)
                     for( i = 0; i < newAnswers.length; i++){
                         if(newAnswers[i].currently_displayed===true && oldAnswers[i].currently_displayed===false){
-                            app.playSound(app.ding, 1040)
+                            app.playSound(app.reveal, 1040)
                         }
                     }
                 }
             },
             sortedFastMoneyQuestions: function(newQuestions, oldQuestions){
-                if(typeof oldQuestions !== "undefined"){
-                    for(i=0; i<newQuestions.length; i++){
+                if((typeof oldQuestions !== "undefined") && (newQuestions !=="undefined")){
+                    for(i=0; i < newQuestions.length; i++){
                         //play sound on reveal player 1 or player 2 answer text
                         if(
                             (newQuestions[i].player_1_answer.display_answer===true && oldQuestions[i].player_1_answer.display_answer===false) ||
@@ -770,18 +804,18 @@
         background-position: center;
     }
     .fast-money-grid {
-        font-family:  'Arial Narrow', arial;
+        font-family:  'Gill Sans Condensed', 'Arial Narrow', arial;
         font-weight:500;
         display: flex;
         flex-direction: column;
-        justify-content: space-evenly;
+        justify-content: space-between;
         align-items: space-between;
-        border-color: black;
+        border-color: #2c99fa;
         border-style: double;
         border-width: 30px;
         border-radius: 50px;
         padding: 50px 10px 40px 10px;
-        background-color:blue;
+        background-color:darkblue;
         width: 790px;
         height: 570px;
     
@@ -789,18 +823,16 @@
     .fm-column {
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
         width: 50%;
     }
-
     .fm-row {
         display: flex;
         flex-direction: row;
         justify-content: center;
         align-content: center;
         width: 100%;
-        height: 60px;
-        padding: 7px 0 7px 0;
+        padding: 8px 0 8px 0;
     }
     .fm-box {
         display: flex;
@@ -815,6 +847,7 @@
         padding-bottom:0px;
         text-transform: uppercase;
         border-radius: 5px;
+        height: 50px;
     }
     .fm-answer-box {
         width:78%;
@@ -829,7 +862,6 @@
         display: flex;
         flex-direction: row;
         width: 100%;
-        height: 400px;
     }
 
     {% comment %} .blinky {
@@ -859,29 +891,35 @@
         flex-direction: row;
         justify-content: space-between;
         width: 30%;
-        padding: 10px;
+        padding: 0 10px 0 10px;
+        height: 50px;
     }
     #fm-total-2 {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         width: 30%;
-        padding: 10px;
+        padding: 0 10px 0 10px;
+        height: 50px;
     }
 
     .timer {
-        width: 150px;
-        height: 125px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        width: 120px;
+        height: 90px;
         background-color:darkblue;
         color:white;
         border-style: solid;
-        border-color: white;
+        border-color: #1f3ebf;
+        border-width: 10px;
         border-radius: 50%;
-        font-size: 88px;
+        font-size: 56px;
         font-weight: bold;
-        text-align: center;
-        padding-bottom: 30px;
-        margin-bottom: -50px;
+        margin-bottom: -75px;
+        line-height: 1.3em;
     }
 
     .fm-typing {
