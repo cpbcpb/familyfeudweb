@@ -50,7 +50,9 @@
                         <div class="answer-box" v-if="sortedAnswers[0]"  v-bind:class="{flippy : sortedAnswers[0].currently_displayed}">
                             <div class="flip-card-inner">
                                 <div class="flip-card-front">
-                                    <div class="number">1</div>
+                                    <transition name="number1" appear >
+                                        <div class="number" >1</div>
+                                    </transition>
                                 </div>
                                 <div class="flip-card-back">
                                     <div class="answer-text" v-bind:class="{short : sortedAnswers[0].answer_text.length<8}" >[[sortedAnswers[0].answer_text]]</div>
@@ -60,10 +62,14 @@
                         </div>
                         <div v-else  class="answer-box">
                         </div>
+
+
                         <div class="answer-box" v-if="sortedAnswers[1]"  v-bind:class="{flippy : sortedAnswers[1].currently_displayed}">
                             <div class="flip-card-inner">
                                 <div class="flip-card-front">
-                                    <div class="number">2</div>
+                                    <transition name="number2" appear >
+                                        <div class="number" >2</div>
+                                    </transition>
                                 </div>
                                 <div class="flip-card-back">
                                     <div class="answer-text" v-bind:class="{short : sortedAnswers[1].answer_text.length<8}">[[sortedAnswers[1].answer_text]]</div>
@@ -76,7 +82,9 @@
                         <div class="answer-box" v-if="sortedAnswers[2]" v-bind:class="{flippy : sortedAnswers[2].currently_displayed}">
                                 <div class="flip-card-inner">
                                     <div class="flip-card-front">
-                                        <div class="number">3</div>
+                                        <transition name="number3" appear >
+                                            <div class="number" >3</div>
+                                        </transition>
                                     </div>
                                     <div class="flip-card-back">
                                             <div class="answer-text" v-bind:class="{short : sortedAnswers[2].answer_text.length<8}">[[sortedAnswers[2].answer_text]]</div>
@@ -89,7 +97,9 @@
                         <div class="answer-box" v-if="sortedAnswers[3]" v-bind:class="{flippy : sortedAnswers[3].currently_displayed}">
                                 <div class="flip-card-inner">
                                     <div class="flip-card-front">
-                                        <div class="number">4</div>
+                                    <transition name="number4" appear >
+                                        <div class="number" >4</div>
+                                    </transition>
                                     </div>
                                     <div class="flip-card-back">
                                             <div class="answer-text" v-bind:class="{short : sortedAnswers[3].answer_text.length<8}">[[sortedAnswers[3].answer_text]]</div>
@@ -104,7 +114,9 @@
                                     <div class="answer-box" v-if="sortedAnswers[4]" v-bind:class="{flippy : sortedAnswers[4].currently_displayed}">
                                 <div class="flip-card-inner">
                                     <div class="flip-card-front">
-                                        <div class="number">5</div>
+                                    <transition name="number5" appear >
+                                        <div class="number" >5</div>
+                                    </transition>
                                     </div>
                                     <div class="flip-card-back">
                                             <div class="answer-text" v-bind:class="{short : sortedAnswers[4].answer_text.length<8}">[[sortedAnswers[4].answer_text]]</div>
@@ -117,7 +129,9 @@
                             <div class="answer-box" v-if="sortedAnswers[5]" v-bind:class="{flippy : sortedAnswers[5].currently_displayed}">
                                 <div class="flip-card-inner">
                                     <div class="flip-card-front">
-                                        <div class="number">6</div>
+                                    <transition name="number6" appear >
+                                        <div class="number" >6</div>
+                                    </transition>
                                     </div>
                                     <div class="flip-card-back">
                                             <div class="answer-text" v-bind:class="{short : sortedAnswers[5].answer_text.length<8}">[[sortedAnswers[5].answer_text]]</div>
@@ -130,7 +144,9 @@
                         <div class="answer-box" v-if="sortedAnswers[6]" v-bind:class="{flippy : sortedAnswers[6].currently_displayed}">
                                 <div class="flip-card-inner">
                                     <div class="flip-card-front">
-                                        <div class="number">7</div>
+                                    <transition name="number7" appear >
+                                        <div class="number" >7</div>
+                                    </transition>
                                     </div>
                                     <div class="flip-card-back">
                                             <div class="answer-text" v-bind:class="{short : sortedAnswers[6].answer_text.length<8}">[[sortedAnswers[6].answer_text]]</div>
@@ -143,7 +159,9 @@
                         <div class="answer-box" v-if="sortedAnswers[7]" v-bind:class="{flippy : sortedAnswers[7].currently_displayed}">
                                 <div class="flip-card-inner">
                                     <div class="flip-card-front">
-                                        <div class="number">8</div>
+                                    <transition name="number8" appear >
+                                        <div class="number" >8</div>
+                                    </transition>
                                     </div>
                                     <div class="flip-card-back">
                                             <div class="answer-text" v-bind:class="{short : sortedAnswers[7].answer_text.length<8}">[[sortedAnswers[7].answer_text]]</div>
@@ -294,6 +312,7 @@
         delimiters: ['[[', ']]'],
         el: '#app',
         data: {
+            show: false,
             displaySocket: new WebSocket(
                 'ws://' + window.location.host + '/ws/display_answer/'
             ),
@@ -686,6 +705,8 @@
         justify-content: space-evenly;
         border-radius: 9px;
     }
+
+
     .game-column {
         display: flex;
         flex-direction: column;
@@ -693,6 +714,63 @@
         align-items: center;
         width: 310px;
     }
+
+    .number1-enter{
+        opacity: 0;
+    }
+    .number1-enter-active{
+        transition: opacity .1s;
+    }
+    .number2-enter{
+        opacity: 0;
+    }
+    .number2-enter-active{
+        transition: opacity .1s;
+        transition-delay: .1s;
+    }
+    .number3-enter{
+        opacity: 0;
+    }
+    .number3-enter-active{
+        transition: opacity .1s;
+        transition-delay: .2s;
+    }
+    .number4-enter{
+        opacity: 0;
+    }
+    .number4-enter-active{
+        transition: opacity .1s;
+        transition-delay: .3s;
+    }
+    .number5-enter{
+        opacity: 0;
+    }
+    .number5-enter-active{
+        transition: opacity .1s;
+        transition-delay: .4s;
+    }
+    .number6-enter{
+        opacity: 0;
+    }
+    .number6-enter-active{
+        transition: opacity .1s;
+        transition-delay: .5s;
+    }
+    .number7-enter{
+        opacity: 0;
+    }
+    .number7-enter-active{
+        transition: opacity .1s;
+        transition-delay: .6s;
+    }
+    .number8-enter{
+        opacity: 0;
+    }
+    .number8-enter-active{
+        transition: opacity .1s;
+        transition-delay: .7s;
+    }
+
     .answer-box {
         background-image: radial-gradient(lightblue, dodgerblue, blue);
         border-style: double;
