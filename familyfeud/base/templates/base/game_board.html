@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" 
     integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <title>Game Board</title>
+    <link href="https://fonts.googleapis.com/css?family=Lora:700&display=swap" rel="stylesheet">
 </head>
 <body>
 <div id="app">
@@ -38,6 +39,7 @@
                     </div>
                 <div id="score-top" class="score">
                     <span v-show="!state.points_awarded">[[state.question_total]]</span>
+                    <img v-show="state.points_awarded" src="{% static 'base/screenshotLogoV2.png' %}" alt="logo">
                 </div>
                     <div  id="score-right" class="score" v-if="!state.display_logo">
                         [[state.team_2_score]]
@@ -563,11 +565,11 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        margin-top: -2px;
+        margin-top: -20px;
     }
     .logo-text-box div span {
-        font: 900 131px/.75em Georgia, Times, "Times New Roman", serif;
-        vertical-align: 15px;
+        font: 900 140px/.75em Lora, Times, "Times New Roman", serif;
+        vertical-align: 0px;
         -webkit-text-stroke: 2.5px #6c0400;
         paint-order:stroke fill;
         display: inline-block;
@@ -589,12 +591,12 @@
     }
     .first-letter {
         font-size: 200px !important;
-        vertical-align: -10px !important;
+        vertical-align: -20px !important;
     }
     .y {
-        font-size: 155px !important;
-        vertical-align: 31px !important;
-        line-height: 1.15em !important;
+        font-size: 150px !important;
+        vertical-align: 22px !important;
+        line-height: 1.3em !important;
     }
 
  #logo-background {
@@ -607,7 +609,8 @@
         background-size: 950px 600px;
         background-position: center;
         background-repeat: no-repeat;
-        background-image: url('{% static 'base/croppedbg2.jpg' %}');
+        background-color:darkblue;
+        {% comment %} background-image: url('{% static 'base/croppedbg2.jpg' %}'); {% endcomment %}
     } 
 
  #game-background {
@@ -617,7 +620,10 @@
         align-items: center;
         width: 800px;
         height: 600px;  
-        background: url('{% static 'base/croppedbg2.jpg' %}') no-repeat center 950px 600px;
+        background-image: url('{% static 'base/croppedbg2.jpg' %}');
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 950px 600px;
     } 
     #regular-game {
         margin-top:50px;
@@ -659,7 +665,7 @@
         line-height:1em;
         border-style:solid;
         border-color:black;
-        background-color: blue;
+        background-color: darkblue;
         border-width: 5px;
         border-radius:10px;
 
@@ -669,6 +675,11 @@
         padding: 18px 68px 20px 68px;
         height: 130px;
         font-size:65px;
+    }
+    #score-top img {
+        width: 190px;
+        repeat: no-repeat;
+        
     }
     #score-left {
         font-size:40px;
