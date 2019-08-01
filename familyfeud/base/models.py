@@ -43,6 +43,8 @@ class GameStatus(models.Model):
     timer = models.IntegerField(default=20)
     display_timer = models.BooleanField(default=False)
     last_question = models.ForeignKey(Question, related_name='last_question', on_delete=models.CASCADE, null=True, blank=True)
+    display_winner_screen = models.BooleanField(default=False)
+    winner_name = models.CharField(default='', max_length=200)
 
 
 class FastMoneyAnswer(models.Model):

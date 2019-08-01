@@ -79,6 +79,8 @@ def get_current_game_state_as_dict():
         'show_single_x': False,
         'show_total_wrong': False,
         'no_active_game': False,
+        'display_winner_screen': current_game_status.display_winner_screen,
+        'winner_name': current_game_status.winner_name
     }
 
 def sumAnswerTotals(answers):
@@ -308,6 +310,27 @@ def toggleFastMoney(start_fast_money):
         else:
             currentGameStatus.is_fast_money = False
             currentGameStatus.display_logo = True
+        currentGameStatus.save()
+    except Exception as e:
+        print(e)
+        return {'isSuccessful': False}
+    return {'isSuccessful': True}
+
+def displayWinnerScreen(winner):
+    try:
+        currentGameStatus = getCurrentGameStatus()
+        currentGameStatus.winner_name = winner
+        currentGameStatus.display_winner_screen = True
+        currentGameStatus.save()
+    except Exception as e:
+        print(e)
+        return {'isSuccessful': False}
+    return {'isSuccessful': True}
+
+def hideWinnerScreen():
+    try:
+        currentGameStatus = getCurrentGameStatus()
+        currentGameStatus.display_winner_screen = False
         currentGameStatus.save()
     except Exception as e:
         print(e)
