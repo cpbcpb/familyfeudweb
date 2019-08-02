@@ -1,2 +1,2 @@
-./familyfeud/base/migrations/
-*.pyc
+__pycache__/
+*.py[cod]
