@@ -12,6 +12,7 @@
 </head>
 <body>
 <div id="app">
+    {% comment %} <div style="color:white; margin-top:500px;">[[state]]</div> {% endcomment %}
     <div id="logo-background" v-if="(state.no_active_games )|| (state.display_logo && !state.is_fast_money)">
         <div class="logo-oval" v-show="state.display_logo">
             <div class="logo-text-box" >
@@ -31,7 +32,7 @@
         {% comment %}  
         <div class="logo-oval" v-show="state.display_logo"><img src="{% static 'base/logo.png'%}"> </div>
        {% endcomment %}
-        <div v-if="!state.no_active_games">
+        <div v-if="!state.no_active_games && !state.is_fast_money && !state.display_logo">
             <div id="regular-game" v-if="!state.is_fast_money && !state.display_logo">
                 <div class="score-row">
                     <div id="score-left" class="score">
@@ -186,6 +187,21 @@
         </div>
     </div>
             <div id="fast-money-game" v-if="state.is_fast_money">
+                <div class="center-logo-fm" v-show="state.display_logo">
+                <div class="logo-oval">
+                    <div class="logo-text-box" >
+                        <div>
+                            <span class="first-letter" data-text="C">C</span>
+                            <span data-text="OUNT">OUNT</span>
+                            <span class="y" data-text="y">y</span>
+                        </div>
+                        <div>
+                            <span class="first-letter" data-text="F">F</span>
+                            <span data-text="EUD">EUD</span>
+                        </div>
+                    </div>
+                </div>
+                </div>
                 <div class="fast-money-grid" v-if="!state.display_logo">
                     <div class="fast-money-big-row">
                         <div class="fm-column fm-column-left">
@@ -624,6 +640,8 @@
         background-position: center;
         background-size: 950px 600px;
     } 
+
+
     #regular-game {
         margin-top:50px;
         display: flex;
@@ -885,6 +903,18 @@ for the initial reveal of the game board in a regular round. {% endcomment %}
         background-repeat: no-repeat;
         background-position: center;
     }
+
+    .center-logo-fm {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+    .center-logo-fm .logo-oval {
+    width: 750px;
+    }
+
     .fast-money-grid {
         font-family:  'Gill Sans Condensed', 'Arial Narrow', arial;
         font-weight:500;
