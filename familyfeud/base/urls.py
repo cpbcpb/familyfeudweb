@@ -25,4 +25,6 @@ urlpatterns = [
     url(r'^admin/setTimer/$', views.setTimer, name='setTimer'),
     url(r'^admin/toggleDisplayTimer/$', views.toggleDisplayTimer, name='toggleDisplayTimer'),
     url(r'^admin/toggleFastMoney/$', views.toggleFastMoney, name='toggleFastMoney'),
+    url(r'^admin/displayWinnerScreen/$', views.displayWinnerScreen, name='displayWinnerScreen'),
+    url(r'^admin/hideWinnerScreen/$', views.hideWinnerScreen, name='hideWinnerScreen'),
 ]

@@ -159,3 +159,7 @@ td {
 .fm-input input{
     width: 100%;
 }
+
+.winner {
+    margin: 10px;
+}

@@ -286,3 +286,25 @@ def toggleFastMoney(request):
         if data_response['isSuccessful']:
             data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
         return setJsonResponse(data_response)
+
+@csrf_exempt
+def displayWinnerScreen(request):
+    """ Inserts the text of a fast money answer. """
+    if request.method == 'POST':
+        winner = request.POST['winner']
+
+        data_response = data_handler.displayWinnerScreen(winner)
+
+        if data_response['isSuccessful']:
+            data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
+        return setJsonResponse(data_response)
+
+@csrf_exempt
+def hideWinnerScreen(request):
+    """ Inserts the text of a fast money answer. """
+    if request.method == 'POST':
+        data_response = data_handler.hideWinnerScreen()
+
+        if data_response['isSuccessful']:
+            data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
+        return setJsonResponse(data_response)
