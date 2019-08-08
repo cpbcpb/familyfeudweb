@@ -245,6 +245,17 @@ def toggleFastMoneyValue(request):
         return setJsonResponse(data_response)
 
 @csrf_exempt
+def togglePlayer1Answers(request):
+    if request.method == 'POST':
+        display_it = request.POST['displayIt']
+
+        data_response = data_handler.togglePlayer1Answers(display_it)
+
+        if data_response['isSuccessful']:
+            data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
+        return setJsonResponse(data_response)
+
+@csrf_exempt
 def setTimer(request):
     """ Assigns a point value to a given fast money answer using the answer ID . """
     if request.method == 'POST':

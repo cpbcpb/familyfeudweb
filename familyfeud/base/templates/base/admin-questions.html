@@ -142,7 +142,7 @@
                         <table class="fm-table">
                             <tr v-for="question in state.fast_money.questions">
                                 <td class="fm-question">[[question.text]]</td>
-                                <td class="fm-input"><input type="text" v-model="question['player_1_answer'].answer_text" v-on:blur="updateFastMoneyAnswer(question.id, 1, $event)"></td>
+                                <td class="fm-input"><input autocomplete="off" spellcheck="true" autocorrect="off" type="text" v-model="question['player_1_answer'].answer_text" v-on:blur="updateFastMoneyAnswer(question.id, 1, $event)"></td>
                                 <td class="fm-select">
                                     <select name="" v-on:change="assignPointValue(question.id, 1, $event)" id="" v-model="question['player_1_answer'].answer_id">
                                         <option value="" disabled selected>Select an answer</option>
@@ -160,7 +160,7 @@
                         <table  class="fm-table">
                             <tr v-for="question in state.fast_money.questions">
                                 <td class="fm-question">[[question.text]]</td>
-                                <td class="fm-input"><input type="text" v-model="question['player_2_answer'].answer_text" v-on:blur="updateFastMoneyAnswer(question.id, 2, $event)"></td>
+                                <td class="fm-input"><input autocomplete="off" spellcheck="true" autocorrect="off" type="text" v-model="question['player_2_answer'].answer_text" v-on:blur="updateFastMoneyAnswer(question.id, 2, $event)"></td>
                                 <td class="fm-select">
                                     <select name="" v-on:change="assignPointValue(question.id, 2, $event)"  v-model="question['player_2_answer'].answer_id" id="">
                                         <option value="" disabled selected>Select an answer</option>
@@ -177,7 +177,11 @@
                         <table  class="fm-table">
                             <tr>
                                 <th>Question</th>
-                                <th>Player 1</th>
+                                <th>
+                                    Player 1 <br>
+                                    <button v-on:click="togglePlayer1Answers('0')" class="btn btn-primary">Hide All</button>
+                                    <button v-on:click="togglePlayer1Answers('1')" class="btn btn-danger">Display All</button>
+                                </th>
                                 <th>Player 2</th>
                             </tr>
                             <tr v-for="question in state.fast_money.questions">
@@ -525,6 +529,19 @@
                         app.state = response['data']['state']
                     }
                 })
+            },
+            togglePlayer1Answers: function(displayIt) {
+                var formData = new FormData();
+                formData.set('displayIt', displayIt);
+                axios({
+                    method: 'post',
+                    url: '/base/admin/togglePlayer1Answers/',
+                    data: formData
+                }).then(function (response) {
+                    if (response['data']['isSuccessful']) {
+                        app.state = response['data']['state'];
+                    }
+                });
             },
             toggleTimer: function(startTimer) {
                 var formData = new FormData();

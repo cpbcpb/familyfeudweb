@@ -83,11 +83,11 @@ def get_current_game_state_as_dict():
         'winner_name': current_game_status.winner_name
     }
 
-def sumAnswerTotals(answers):
+def sumAnswerTotals(answers, multiplier):
     total = 0
     for answer in answers:
         total += answer['point_value']
-    return total
+    return total * multiplier
 
 def createNewGame(question_set, team_1_name, team_2_name):
     try: 
@@ -147,7 +147,8 @@ def displayAnswer(answer_id):
         current_game_status.save()
         if not current_game_status.points_awarded:
             currently_displayed = list(current_game_status.displayed_answers.values())
-            current_game_status.question_total = sumAnswerTotals(currently_displayed)
+            score_multipler = current_game_status.current_question.score_multiplier
+            current_game_status.question_total = sumAnswerTotals(currently_displayed, score_multipler)
             current_game_status.save()
     except Exception as e:
         print(e)
@@ -278,6 +279,23 @@ def toggleFastMoneyValueDisplay(question_id, player, display_it):
         return {'isSuccessful': False}
     return {'isSuccessful': True}
 
+def togglePlayer1Answers(display_it):
+    try:
+        current_game_status = getCurrentGameStatus()
+        p1_fast_money_answers = FastMoneyAnswer.objects.filter(Q(game_status=current_game_status) & Q(player=1))
+        for answer in p1_fast_money_answers:
+            if display_it == '1':
+                answer.display_answer = True
+                answer.display_value = True
+            else:
+                answer.display_answer = False
+                answer.display_value = False
+            answer.save()
+    except Exception as e:
+        print(e)
+        return {'isSuccessful': False}
+    return {'isSuccessful': True}
+
 def updateTimer(timer_value):
     try:
         current_game_status = getCurrentGameStatus()
@@ -336,3 +354,4 @@ def hideWinnerScreen():
         print(e)
         return {'isSuccessful': False}
     return {'isSuccessful': True}
+

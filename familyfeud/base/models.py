@@ -13,6 +13,7 @@ class Question(models.Model):
     game = models.ForeignKey(QuestionSet, on_delete=models.CASCADE)
     question_order = models.IntegerField(default=0)
     is_fast_money = models.BooleanField(default=False)
+    score_multiplier = models.IntegerField(default=1)
     def __str__(self):
         return self.question_text
 

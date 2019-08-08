@@ -21,6 +21,7 @@ urlpatterns = [
     url(r'^admin/assignPointValue/$', views.assignPointValue, name='assignPointValue'),
     url(r'^admin/toggleFastMoneyAnswer/$', views.toggleFastMoneyAnswer, name='toggleFastMoneyAnswer'),
     url(r'^admin/toggleFastMoneyValue/$', views.toggleFastMoneyValue, name='toggleFastMoneyValue'),
+    url(r'^admin/togglePlayer1Answers/$', views.togglePlayer1Answers, name='togglePlayer1Answers'),
     url(r'^admin/toggleTimer/$', views.toggleTimer, name='toggleTimer'),
     url(r'^admin/setTimer/$', views.setTimer, name='setTimer'),
     url(r'^admin/toggleDisplayTimer/$', views.toggleDisplayTimer, name='toggleDisplayTimer'),
