@@ -167,7 +167,8 @@ def hideAnswer(answer_id):
 
         if not current_game_status.points_awarded:
             currently_displayed = list(current_game_status.displayed_answers.values())
-            current_game_status.question_total = sumAnswerTotals(currently_displayed)
+            score_multipler = current_game_status.current_question.score_multiplier
+            current_game_status.question_total = sumAnswerTotals(currently_displayed, score_multipler)
             current_game_status.save()
     except Exception as e:
         print(e)

@@ -91,7 +91,6 @@ class DisplayAnswerConsumer(AsyncWebsocketConsumer):
         }))
 
     async def send_state(self, event):
-        print("check")
         state = event['state']
         await self.send(text_data=json.dumps({
             'state': state
