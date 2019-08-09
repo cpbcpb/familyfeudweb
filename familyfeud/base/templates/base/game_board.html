@@ -241,8 +241,8 @@
                     <div class="fm-total-row">
                         <div id= "fm-total-1" class="fm-box">
                             <div> TOTAL</div>
-                            <div v-if="!finalTotal">[[fastMoneyPlayer1Total]]</div>
-                            <div v-else>[[finalTotal]]</div>
+                            <div v-if="!p1FinalTotal">[[fastMoneyPlayer1Total]]</div>
+                            <div v-else>[[p1FinalTotal]]</div>
                         </div>
                                     <timer
                 v-bind:timer="state.fast_money.timer"
@@ -361,7 +361,7 @@
             fmRevealZero: new Audio('{% static 'base/buzz.mp3' %}'),
             fmOutOfTime: new Audio('{% static 'base/buzz.mp3' %}'),
             //player 1's final total in fast money round.
-            finalTotal: 0,
+            p1FinalTotal: 0,
             state: {display_logo: true},
         },
         methods: {
@@ -444,7 +444,7 @@
                         }       
                     })
                     if(showCounter >= this.state.fast_money.questions.length){
-                        app.finalTotal = total;
+                        app.p1FinalTotal = total;
                     }
                     return total;
                 }
