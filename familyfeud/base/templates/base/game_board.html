@@ -57,7 +57,7 @@
                                     </transition>
                                 </div>
                                 <div class="flip-card-back">
-                                    <div class="answer-text" v-bind:class="{short : sortedAnswers[0].answer_text.length<8}" >[[sortedAnswers[0].answer_text]]</div>
+                                    <div class="answer-text" v-bind:class="{short : sortedAnswers[0].answer_text.length<9}" >[[sortedAnswers[0].answer_text]]</div>
                                     <div class="answer-points">[[sortedAnswers[0].point_value]]</div>
                                 </div>
                             </div>
@@ -74,7 +74,7 @@
                                     </transition>
                                 </div>
                                 <div class="flip-card-back">
-                                    <div class="answer-text" v-bind:class="{short : sortedAnswers[1].answer_text.length<8}">[[sortedAnswers[1].answer_text]]</div>
+                                    <div class="answer-text" v-bind:class="{short : sortedAnswers[1].answer_text.length<9}">[[sortedAnswers[1].answer_text]]</div>
                                     <div class="answer-points">[[sortedAnswers[1].point_value]]</div>
                                 </div>
                             </div>
@@ -89,7 +89,7 @@
                                         </transition>
                                     </div>
                                     <div class="flip-card-back">
-                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[2].answer_text.length<8}">[[sortedAnswers[2].answer_text]]</div>
+                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[2].answer_text.length<9}">[[sortedAnswers[2].answer_text]]</div>
                                             <div class="answer-points">[[sortedAnswers[2].point_value]]</div>
                                     </div>
                                 </div>
@@ -104,7 +104,7 @@
                                     </transition>
                                     </div>
                                     <div class="flip-card-back">
-                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[3].answer_text.length<8}">[[sortedAnswers[3].answer_text]]</div>
+                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[3].answer_text.length<9}">[[sortedAnswers[3].answer_text]]</div>
                                             <div class="answer-points">[[sortedAnswers[3].point_value]]</div>
                                     </div>
                                 </div>
@@ -121,7 +121,7 @@
                                     </transition>
                                     </div>
                                     <div class="flip-card-back">
-                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[4].answer_text.length<8}">[[sortedAnswers[4].answer_text]]</div>
+                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[4].answer_text.length<9}">[[sortedAnswers[4].answer_text]]</div>
                                             <div class="answer-points">[[sortedAnswers[4].point_value]]</div>
                                     </div>
                                 </div>
@@ -136,7 +136,7 @@
                                     </transition>
                                     </div>
                                     <div class="flip-card-back">
-                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[5].answer_text.length<8}">[[sortedAnswers[5].answer_text]]</div>
+                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[5].answer_text.length<9}">[[sortedAnswers[5].answer_text]]</div>
                                             <div class="answer-points">[[sortedAnswers[5].point_value]]</div>
                                     </div>
                                 </div>
@@ -151,7 +151,7 @@
                                     </transition>
                                     </div>
                                     <div class="flip-card-back">
-                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[6].answer_text.length<8}">[[sortedAnswers[6].answer_text]]</div>
+                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[6].answer_text.length<9}">[[sortedAnswers[6].answer_text]]</div>
                                             <div class="answer-points">[[sortedAnswers[6].point_value]]</div>
                                     </div>
                                 </div>
@@ -166,7 +166,7 @@
                                     </transition>
                                     </div>
                                     <div class="flip-card-back">
-                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[7].answer_text.length<8}">[[sortedAnswers[7].answer_text]]</div>
+                                            <div class="answer-text" v-bind:class="{short : sortedAnswers[7].answer_text.length<9}">[[sortedAnswers[7].answer_text]]</div>
                                             <div class="answer-points">[[sortedAnswers[7].point_value]]</div>
                                     </div>
                                 </div>
@@ -204,6 +204,9 @@
                 <div class="fast-money-grid" v-if="!state.display_logo">
                     <div class="fast-money-big-row">
                         <div class="fm-column fm-column-left">
+                            <div class="fm-row name">
+                                <span>[[state.team_1_name]]<span>
+                            </div>
                             <div class="fm-row" v-for="question in state.fast_money.questions">
                                 <div class="fm-box fm-answer-box">
                                     <span v-if="question.player_1_answer.display_answer" class="fm-typing">[[question.player_1_answer.answer_text]]</span>
@@ -218,6 +221,9 @@
     
                         </div>
                         <div class="fm-column fm-column-right">
+                            <div class="fm-row name">
+                                <span>[[state.team_2_name]]<span>
+                            </div>
                             <div class="fm-row" v-for="question in state.fast_money.questions">
                                 <div class="fm-box fm-answer-box">
                                 <span v-if="question.player_2_answer.display_answer" class="fm-typing" >[[question.player_2_answer.answer_text]]</span>
@@ -529,6 +535,7 @@
 
 {% endcomment %}
 <style>
+
     #app {
         display: flex;
         flex-direction: column;
@@ -538,6 +545,7 @@
         height: 100vh;
         width: 100vw;
         background-color:black;
+        font-family: arial;
         {% comment %} background-image: url('{% static 'base/floodlights.jpg' %}'); 
         background-size: cover;{% endcomment %}
 
@@ -810,7 +818,7 @@ for the initial reveal of the game board in a regular round. {% endcomment %}
         color: white;
         text-transform: uppercase;
         text-shadow: 2px .5px #000000;
-        font-size: 29px;
+        font-size: 26px;
         background-image: linear-gradient(dodgerblue, blue, darkblue );
         height: 100%;
         width: 85%;
@@ -818,7 +826,7 @@ for the initial reveal of the game board in a regular round. {% endcomment %}
         overflow:hidden;
     }
     .short {
-        font-size:39px;
+        font-size:36px;
     }
     .answer-points {
         color: white;
@@ -903,6 +911,12 @@ for the initial reveal of the game board in a regular round. {% endcomment %}
         background-position: center;
     }
 
+    .name  {
+        font: 600 40px/.75em 'Arial' !important;
+        text-transform: uppercase;
+        color:lightblue;
+
+    }
     .center-logo-fm {
         display: flex;
         flex-direction: column;
@@ -925,7 +939,7 @@ for the initial reveal of the game board in a regular round. {% endcomment %}
         border-style: double;
         border-width: 30px;
         border-radius: 50px;
-        padding: 50px 10px 40px 10px;
+        padding: 20px 10px 40px 10px;
         background-color:darkblue;
         width: 790px;
         height: 570px;
