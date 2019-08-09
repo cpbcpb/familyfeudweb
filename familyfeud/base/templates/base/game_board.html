@@ -240,7 +240,9 @@
                     </div>
                     <div class="fm-total-row">
                         <div id= "fm-total-1" class="fm-box">
-                            <div> TOTAL</div><div>[[fastMoneyPlayer1Total]]</div>
+                            <div> TOTAL</div>
+                            <div v-if="!finalTotal">[[fastMoneyPlayer1Total]]</div>
+                            <div v-else>[[finalTotal]]</div>
                         </div>
                                     <timer
                 v-bind:timer="state.fast_money.timer"
@@ -335,7 +337,6 @@
         delimiters: ['[[', ']]'],
         el: '#app',
         data: {
-            show: false,
             displaySocket: new WebSocket(
                 'ws://' + window.location.host + '/ws/display_answer/'
             ),
@@ -345,24 +346,22 @@
             //regular round answer is revealed
             reveal: new Audio('{% static 'base/reveal.mp3' %}'),
             fmRevealText: new Audio('{% static 'base/fastmoney-showtext.mp3' %}'),
-
-
+    
             //These sounds will need to be done from soundboard when appropriate, are not automatic
             //hand-buzzer
             //stinger-win-game
             //stinger-podium
-
             //sounds below here to be replaced
             // Sound that plays with wrong answers.
             timerFM: new Audio('{% static 'base/timerFM.mp3' %}'),
             //Ding is the sound that plays when an answer is revealed.
             ding: new Audio('{% static 'base/belldesk.mp3' %}'),
             //fast money reveal answer
-
-
             fmRevealPoints: new Audio('{% static 'base/reveal-fastmoney.mp3' %}'),
             fmRevealZero: new Audio('{% static 'base/buzz.mp3' %}'),
             fmOutOfTime: new Audio('{% static 'base/buzz.mp3' %}'),
+            //player 1's final total in fast money round.
+            finalTotal: 0,
             state: {display_logo: true},
         },
         methods: {
@@ -437,12 +436,16 @@
             fastMoneyPlayer1Total : function(){
                 if(this.state.is_fast_money){
                     let total = 0;
-
+                    let showCounter = 0;
                     this.state.fast_money.questions.forEach(function(question){
                         if(question.player_1_answer.display_value){
+                            showCounter++;
                             total += question.player_1_answer.point_value;
                         }       
                     })
+                    if(showCounter >= this.state.fast_money.questions.length){
+                        app.finalTotal = total;
+                    }
                     return total;
                 }
             },
@@ -484,7 +487,7 @@
                 }
             },
             sortedFastMoneyQuestions: function(newQuestions, oldQuestions){
-                if((typeof oldQuestions !== "undefined") && (newQuestions !=="undefined")){
+                if((typeof oldQuestions !== "undefined") && (typeof newQuestions !=="undefined")){
                     for(i=0; i < newQuestions.length; i++){
                         //play sound on reveal player 1 or player 2 answer text
                         if(
