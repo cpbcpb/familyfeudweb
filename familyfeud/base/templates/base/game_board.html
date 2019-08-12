@@ -11,8 +11,10 @@
 </head>
 <body>
 <div id="app">
-    <div v-if="state.display_winner_screen" class="congrats" style="position: absolute; color:white;">
-    Congratulations, [[state.winner_name]]!
+    <div v-if="state.display_winner_screen"  style="position: absolute;"
+    data-text="Congratulations">
+    <span class="congrats" data-text="Congratulations">Congratulations, </span>
+    <span class="congrats" data-text="{state.winner_name}">[[state.winner_name]]!</span>
     </div>
     <div id="logo-background" v-if="(state.no_active_games )|| (state.display_logo)">
     </div>
@@ -564,7 +566,7 @@
         -webkit-text-fill-color: transparent;
         position:relative;
     }
-    .congrats::after {
+    .congrats span::after {
         display: inline-block;
         content: attr(data-text);
         position: absolute;
