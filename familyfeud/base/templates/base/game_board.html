@@ -11,26 +11,10 @@
 </head>
 <body>
 <div id="app">
-    {% comment %} <div style="color:white; margin-top:500px;">[[state]]</div> {% endcomment %}
-    <div id="logo-background" v-if="(state.no_active_games )|| (state.display_logo && !state.is_fast_money)">
-        <div class="logo-oval" v-show="state.display_logo">
-            <div class="logo-text-box" >
-                <div>
-                    <span class="first-letter" data-text="C">C</span>
-                    <span data-text="OUNT">OUNT</span>
-                    <span class="y" data-text="y">y</span>
-                </div>
-                <div>
-                    <span class="first-letter" data-text="F">F</span>
-                    <span data-text="EUD">EUD</span>
-                </div>
-            </div>
-        </div> 
+    <div id="logo-background" v-if="(state.no_active_games )|| (state.display_logo)">
     </div>
     <div id="game-background" v-if="!state.display_logo && !state.is_fast_money">
-        {% comment %}  
-        <div class="logo-oval" v-show="state.display_logo"><img src="{% static 'base/logo.png'%}"> </div>
-       {% endcomment %}
+
         <div v-if="!state.no_active_games && !state.is_fast_money && !state.display_logo">
             <div id="regular-game" v-if="!state.is_fast_money && !state.display_logo">
                 <div class="score-row">
@@ -185,22 +169,7 @@
             </div>
         </div>
     </div>
-            <div id="fast-money-game" v-if="state.is_fast_money">
-                <div class="center-logo-fm" v-show="state.display_logo">
-                <div class="logo-oval">
-                    <div class="logo-text-box" >
-                        <div>
-                            <span class="first-letter" data-text="C">C</span>
-                            <span data-text="OUNT">OUNT</span>
-                            <span class="y" data-text="y">y</span>
-                        </div>
-                        <div>
-                            <span class="first-letter" data-text="F">F</span>
-                            <span data-text="EUD">EUD</span>
-                        </div>
-                    </div>
-                </div>
-                </div>
+            <div id="fast-money-game" v-if="state.is_fast_money && !state.display_logo">
                 <div class="fast-money-grid" v-if="!state.display_logo">
                     <div class="fast-money-big-row">
                         <div class="fm-column fm-column-left">
@@ -244,13 +213,13 @@
                             <div v-if="!p1FinalTotal">[[fastMoneyPlayer1Total]]</div>
                             <div v-else>[[p1FinalTotal]]</div>
                         </div>
-                                    <timer
-                v-bind:timer="state.fast_money.timer"
-                v-bind:display_timer="state.fast_money.display_timer"
-                v-bind:start_timer="state.fast_money.start_timer"
-                v-bind:stop_timer="state.fast_money.stop_timer"
-            >
-            </timer>
+                        <timer
+                            v-bind:timer="state.fast_money.timer"
+                            v-bind:display_timer="state.fast_money.display_timer"
+                            v-bind:start_timer="state.fast_money.start_timer"
+                            v-bind:stop_timer="state.fast_money.stop_timer"
+                        >
+                        </timer>
                         <div id="fm-total-2" class="fm-box">
                             <div> TOTAL</div><div>[[fastMoneyPlayer2Total]]</div>
                         </div>
@@ -549,12 +518,9 @@
         width: 100vw;
         background-color:black;
         font-family: arial;
-        {% comment %} background-image: url('{% static 'base/floodlights.jpg' %}'); 
-        background-size: cover;{% endcomment %}
-
     }
 
-    .logo-oval {
+    {% comment %} .logo-oval {
         display: flex;
         justify-content: center;
         align-items: flex-start;
@@ -583,8 +549,8 @@
         right: 1.25px;
         bottom: 1.25px;
         z-index: -2;
-    }
-
+    } {% endcomment %}
+{% comment %} 
     .logo-text-box {
         position: absolute;
         display: flex;
@@ -623,7 +589,7 @@
         font-size: 150px !important;
         vertical-align: 22px !important;
         line-height: 1.3em !important;
-    }
+    } {% endcomment %}
 
  #logo-background {
         display: flex;
@@ -632,10 +598,10 @@
         align-items: center;
         width: 800px;
         height: 600px; 
-        background-size: 950px 600px;
+        background-size: contain;
         background-position: center;
         background-repeat: no-repeat;
-        background-image: url('{% static 'base/croppedbg2.jpg' %}');
+        background-image: url('{% static 'base/finallogo.png' %}');
     } 
 
  #game-background {
@@ -645,7 +611,7 @@
         align-items: center;
         width: 800px;
         height: 600px;  
-        background-image: url('{% static 'base/croppedbg2.jpg' %}');
+        background-image: url('{% static 'base/finalregulargamebg.jpg' %}');
         background-repeat: no-repeat;
         background-position: center;
         background-size: 950px 600px;
@@ -906,7 +872,7 @@ for the initial reveal of the game board in a regular round. {% endcomment %}
         flex-direction: column;
         align-items: center;
         justify-content: flex-end;
-        background-image: url('{% static 'base/fmbackground.png' %}');
+        background-image: url('{% static 'base/finalfmbg.png' %}');
         width: 1200px;
         height: 600px;
         background-size: 1015px 620px;
@@ -927,9 +893,9 @@ for the initial reveal of the game board in a regular round. {% endcomment %}
         align-items: center;
         height: 100%;
     }
-    .center-logo-fm .logo-oval {
+    {% comment %} .center-logo-fm .logo-oval {
     width: 750px;
-    }
+    } {% endcomment %}
 
     .fast-money-grid {
         font-family:  'Gill Sans Condensed', 'Arial Narrow', arial;
