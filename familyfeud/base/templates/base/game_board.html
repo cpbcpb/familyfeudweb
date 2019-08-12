@@ -375,6 +375,9 @@
             }
         },
         computed: {
+            create_date: function(){
+                return this.state.create_date;
+            },
             display_logo: function(){
                 return this.state.display_logo;
             },
@@ -441,6 +444,11 @@
             }
         },
         watch: {
+            create_date: function(newDate, oldDate){
+                if( typeof newDate !== "undefined" && typeof oldDate !=="undefined"){
+                    app.p1FinalTotal=0;
+                }
+            },
             display_logo: function(newBoolean, oldBoolean){
                 //plays a sound when new board is revealed in regular round
                 if( newBoolean === false && oldBoolean === true && this.state.is_fast_money===false){
