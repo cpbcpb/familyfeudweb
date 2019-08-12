@@ -12,8 +12,13 @@
 <body>
 <div id="app">
     <div v-if="state.display_winner_screen" class="congrats">
-    <div><span data-text="Congratulations">Congratulations, </span></div>
-    <div><span v-bind:data-text="state.winner_name">[[state.winner_name]]!</span></div>
+        <div>
+        <div class="congrats-text "data-text="Congratulations, ">Congratulations,</div>
+        <div class="congrats-text" v-bind:data-text="state.winner_name + '!'">[[state.winner_name]]!</div>
+        </div>
+        <div class="congrats-img">
+            <img src="{% static 'base/realauctioncountyfeudedition.png'%}">
+        </div>
     </div>
     <div id="logo-background" v-if="(state.no_active_games )|| (state.display_logo)">
     </div>
@@ -173,7 +178,7 @@
             </div>
         </div>
     </div>
-            <div id="fast-money-game" v-if="state.is_fast_money && !state.display_logo">
+        <div id="fast-money-game" v-if="state.is_fast_money && !state.display_logo">
                 <div class="fast-money-grid" v-if="!state.display_logo">
                     <div class="fast-money-big-row">
                         <div class="fm-column fm-column-left">
@@ -191,7 +196,7 @@
                                 <span v-show="question.player_1_answer.display_value">[[question.player_1_answer.point_value]]</span>
                                 </div>
                             </div>
-    
+
                         </div>
                         <div class="fm-column fm-column-right">
                             <div class="fm-row name">
@@ -554,22 +559,55 @@
         bottom: 1.25px;
         z-index: -2;
     } {% endcomment %}
-    .congrats-div {
-        position: absolute;
-    }
+
     .congrats {
-        font: 900 140px/.75em Lora, Times, "Times New Roman", serif;
-        vertical-align: 0px;
+        padding-top: 35px;
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        background-image: radial-gradient(lightblue, darkblue),url('{% static 'base/backgroundslow.gif' %}');
+        background-blend-mode: soft-light;
+        justify-content: space-between;
+        align-items: center;
+        height: 600px;
+        width: 800px;
+        text-align: center;
+        background-image: 
+        background-color: rgb(0,0,255);
+        z-index: -4;
+        {% comment %} box-shadow: 
+            0 -6.25px 0px 0 dodgerblue,
+            12.5px 17.5px 12.5px black ; {% endcomment %}
+    }
+    .congrats-img img {
+        width: 500px;
+
+
+    }
+.congrats-img {
+        background-color:darkblue;
+        width: 800px;
+
+    } 
+    .congrats div {
+        display: flex;
+        flex-direction: column;
+        justify: center;
+        align-items: center;
+    }
+    .congrats-text {
+        text-transform: uppercase;
+        font: 900 70px/1.25em Lora, Times, "Times New Roman", serif;
         -webkit-text-stroke: 2.5px #6c0400;
         paint-order:stroke fill;
-        display: inline-block;
         background-image: -webkit-linear-gradient(#fc6006, #fef53e);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        z-index:6;
+        position: relative;
+        max-width: max-content;
+        text-align: center;
     }
-    .congrats-div div span::after {
-        display: inline-block;
+    .congrats-text::after {
         content: attr(data-text);
         position: absolute;
         left: 0;
@@ -577,10 +615,9 @@
         text-shadow: 2.5px 2.5px 0 #bcbcbc, 8px 10px 6.5px black;
         -webkit-text-stroke: 6.25px #f7c6c9;
         paint-order: stroke fill;
-        z-index:5;
+        z-index: -3;
+        text-align: center;
     }
-
-
 
     .logo-text-box {
         position: absolute;
@@ -635,6 +672,7 @@
         background-position: center;
         background-repeat: no-repeat;
         background-image: url('{% static 'base/finallogo.png' %}');
+        z-index: -7;
     } 
 
  #game-background {
@@ -648,6 +686,7 @@
         background-repeat: no-repeat;
         background-position: center;
         background-size: 950px 600px;
+        z-index: -6;
     } 
 
 
@@ -911,6 +950,7 @@ for the initial reveal of the game board in a regular round. {% endcomment %}
         background-size: 1015px 620px;
         background-repeat: no-repeat;
         background-position: center;
+        z-index: -5;
     }
 
     .name  {
