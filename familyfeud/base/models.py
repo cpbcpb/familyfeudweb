@@ -41,7 +41,7 @@ class GameStatus(models.Model):
     is_fast_money = models.BooleanField(default=False)
     player_1_score = models.IntegerField(default=0)
     player_2_score = models.IntegerField(default=0)
-    timer = models.IntegerField(default=20)
+    timer = models.IntegerField(default=25)
     display_timer = models.BooleanField(default=False)
     last_question = models.ForeignKey(Question, related_name='last_question', on_delete=models.CASCADE, null=True, blank=True)
     display_winner_screen = models.BooleanField(default=False)

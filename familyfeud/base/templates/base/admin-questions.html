@@ -399,7 +399,8 @@
                     if (response['data']['isSuccessful']) {
                         app.state = response['data']['state']
                         app.fastMoneyAnswers = response['data']['fastMoneyAnswers']
-                        console.log(app.fastMoneyAnswers)
+                        app.currentPlayer = 1;
+                        app.displayAnswersMenu = false;
                     }
                 })
             },
