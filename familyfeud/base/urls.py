@@ -28,4 +28,5 @@ urlpatterns = [
     url(r'^admin/toggleFastMoney/$', views.toggleFastMoney, name='toggleFastMoney'),
     url(r'^admin/displayWinnerScreen/$', views.displayWinnerScreen, name='displayWinnerScreen'),
     url(r'^admin/hideWinnerScreen/$', views.hideWinnerScreen, name='hideWinnerScreen'),
+    url(r'^admin/unlockQuestion/$', views.unlockQuestion, name='unlockQuestion')
 ]

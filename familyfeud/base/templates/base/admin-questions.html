@@ -67,8 +67,9 @@
                     <button v-on:click="hideBoard" v-if="!state.display_logo" class="btn btn-danger"> Hide Board </button>
                     <h3>Current Question: [[state.current_question.question_text]]</h3>
                     <h4>Total: [[state.question_total]]</h4>
-                    <button v-on:click="awardPoints('one')" class="btn btn-primary">Award Team 1 Points</button>
-                    <button v-on:click="awardPoints('two')" class="btn btn-primary">Award Team 2 Points</button>
+                    <button v-if="!state.points_awarded" v-on:click="awardPoints('one')" class="btn btn-primary">Award Team 1 Points</button>
+                    <button v-if="!state.points_awarded" v-on:click="awardPoints('two')" class="btn btn-primary">Award Team 2 Points</button>
+                    <button v-if="state.points_awarded" v-on:click="unlockQuestion()" class="btn btn-danger">Unlock Question</button>
                     <table class='answers-table'>
                         <tr v-for="(value,index) in 4">
                             <td class="answer-text">
@@ -271,8 +272,8 @@
             player2Answers:{},
             showModal: true,
             currentPlayer: 1,
-            team1New: 'Team 1',
-            team2New: 'Team 2',
+            team1New: '',
+            team2New: '',
             winnerName: '',
             displayAnswersMenu: false,
         },
@@ -397,8 +398,10 @@
                     data: formData
                 }).then(function (response) {
                     if (response['data']['isSuccessful']) {
-                        app.state = response['data']['state']
-                        app.fastMoneyAnswers = response['data']['fastMoneyAnswers']
+                        app.state = response['data']['state'];
+                        app.fastMoneyAnswers = response['data']['fastMoneyAnswers'];
+                        app.team1New = '';
+                        app.team2New = '';
                         app.currentPlayer = 1;
                         app.displayAnswersMenu = false;
                     }
@@ -593,6 +596,16 @@
                     method: 'post',
                     url: '/base/admin/toggleFastMoney/',
                     data: formData
+                }).then(function (response) {
+                    if (response['data']['isSuccessful']) {
+                        app.state = response['data']['state']
+                    }
+                })
+            },
+            unlockQuestion: function() {
+                axios({
+                    method: 'post',
+                    url: '/base/admin/unlockQuestion/'
                 }).then(function (response) {
                     if (response['data']['isSuccessful']) {
                         app.state = response['data']['state']

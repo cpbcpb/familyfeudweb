@@ -356,3 +356,12 @@ def hideWinnerScreen():
         return {'isSuccessful': False}
     return {'isSuccessful': True}
 
+def unlockQuestion():
+    try:
+        current_game_status = getCurrentGameStatus()
+        current_game_status.points_awarded = False
+        current_game_status.save()
+    except Exception as e:
+        print(e)
+        return {'isSuccessful': False}
+    return {'isSuccessful': True}
