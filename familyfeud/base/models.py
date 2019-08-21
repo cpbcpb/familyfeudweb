@@ -32,6 +32,7 @@ class GameStatus(models.Model):
     team_1_name = models.CharField(default='', max_length=500)
     team_2_name = models.CharField(default='', max_length=500)
     cooperative_fm = models.BooleanField(default=True)
+    current_fm_player = models.IntegerField(default=1)
     current_question = models.ForeignKey(Question, on_delete=models.CASCADE, null=True, blank=True)
     question_total = models.IntegerField(default=0)
     question_total_wrong = models.IntegerField(default=0)

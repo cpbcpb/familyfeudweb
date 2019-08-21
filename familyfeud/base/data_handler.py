@@ -73,6 +73,7 @@ def get_current_game_state_as_dict():
             'timer': current_game_status.timer,
             'display_timer': current_game_status.display_timer,
             'cooperative': current_game_status.cooperative_fm,
+            'current_player': current_game_status.current_fm_player,
             'start_timer': False,
             'stop_timer': False,
             'questions': questions,
@@ -298,6 +299,9 @@ def togglePlayer1Answers(display_it):
                 answer.display_answer = False
                 answer.display_value = False
             answer.save()
+        if display_it == '1':
+            current_game_status.current_fm_player = 2
+            current_game_status.save()
     except Exception as e:
         print(e)
         return {'isSuccessful': False}
