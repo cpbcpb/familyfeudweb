@@ -20,6 +20,7 @@
                 </select><br>
                 <label for="">Team 1 Name:</label><input v-model="team1New" type="text"><br>
                 <label for="">Team 2 Name:</label><input v-model="team2New" type="text"><br>
+                <label for="cooperativeFM">Cooperative Fast Money:</label><input v-model="cooperativeFM" type="checkbox" id="cooperativeFM"><br>
                 <p v-if="startNewGameError" class="alert alert-danger">[[startNewGameError]]</p>
                 <button type="button" class="btn btn-primary" v-on:click="showNewGameModal">
                 Start New Game
@@ -161,7 +162,7 @@
                         <table  class="fm-table">
                             <tr v-for="question in state.fast_money.questions">
                                 <td class="fm-question">[[question.text]]</td>
-                                <td class="fm-input"><input autocomplete="off" spellcheck="true" autocorrect="off" type="text" v-model="question['player_2_answer'].answer_text" v-on:blur="updateFastMoneyAnswer(question.id, 2, $event)"></td>
+                                <td class="fm-input"><p>P1: <b>[[question['player_1_answer'].answer_text]]</b></p><input autocomplete="off" spellcheck="true" autocorrect="off" type="text" v-model="question['player_2_answer'].answer_text" v-on:blur="updateFastMoneyAnswer(question.id, 2, $event)"></td>
                                 <td class="fm-select">
                                     <select name="" v-on:change="assignPointValue(question.id, 2, $event)"  v-model="question['player_2_answer'].answer_id" id="">
                                         <option value="" disabled selected>Select an answer</option>
@@ -171,6 +172,7 @@
                                 </td>
                             </tr>                                                                                            
                         </table><br>
+                        <button v-on:click="signalRepeatedAnswer" class="btn btn-danger">Repeated Answer</button><br><br>
                     </div>
 
                     <div v-if="displayAnswersMenu" class="white-container">
@@ -274,6 +276,7 @@
             currentPlayer: 1,
             team1New: '',
             team2New: '',
+            cooperativeFM: true,
             winnerName: '',
             displayAnswersMenu: false,
         },
@@ -392,6 +395,7 @@
                 formData.set('game', gameId);
                 formData.set('team1Name', this.team1New);
                 formData.set('team2Name', this.team2New);
+                formData.set('cooperativeFM', this.cooperativeFM);
                 axios({
                     method: 'post',
                     url: '/base/admin/createGame/',
@@ -610,6 +614,12 @@
                     if (response['data']['isSuccessful']) {
                         app.state = response['data']['state']
                     }
+                })
+            },
+            signalRepeatedAnswer: function() {
+                axios({
+                    method: 'post',
+                    url: '/base/admin/signalRepeatedAnswer/'
                 })
             },
 

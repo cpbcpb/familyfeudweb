@@ -72,9 +72,11 @@ def get_current_game_state_as_dict():
             'player_2_score': current_game_status.player_2_score,
             'timer': current_game_status.timer,
             'display_timer': current_game_status.display_timer,
+            'cooperative': current_game_status.cooperative_fm,
             'start_timer': False,
             'stop_timer': False,
-            'questions': questions
+            'questions': questions,
+            'repeated_answer': False
         },
         'show_single_x': False,
         'show_total_wrong': False,
@@ -89,7 +91,7 @@ def sumAnswerTotals(answers, multiplier):
         total += answer['point_value']
     return total * multiplier
 
-def createNewGame(question_set, team_1_name, team_2_name):
+def createNewGame(question_set, team_1_name, team_2_name, cooperative_fm):
     try: 
         current_game = QuestionSet.objects.get(pk=question_set)
         new_game_status = GameStatus.objects.create(current_game=current_game)
@@ -101,6 +103,10 @@ def createNewGame(question_set, team_1_name, team_2_name):
             new_game_status.last_question = questions_ordered.last()
         new_game_status.team_1_name = team_1_name
         new_game_status.team_2_name = team_2_name
+        if cooperative_fm == 'false':
+            new_game_status.cooperative_fm = False
+        else:
+            new_game_status.cooperative_fm = True
         new_game_status.save()
         fast_money_questions = Question.objects.filter(Q(game=current_game) & Q(is_fast_money=True))
         for question in fast_money_questions:

@@ -70,7 +70,8 @@ def adminquestions(request):
 def createNewGame(request):
     """ Creates a new 'GameStatus'. Supply the id of the 'game' you wish to use using 'game' as form data."""
     if request.method == 'POST':
-        data_response = data_handler.createNewGame(request.POST['game'], request.POST['team1Name'], request.POST['team2Name'])
+        print(request.POST['cooperativeFM'])
+        data_response = data_handler.createNewGame(request.POST['game'], request.POST['team1Name'], request.POST['team2Name'], request.POST['cooperativeFM'])
         if data_response['isSuccessful']:
             data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
    
@@ -329,3 +330,11 @@ def unlockQuestion(request):
         if data_response['isSuccessful']:
             data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
         return setJsonResponse(data_response)
+
+@csrf_exempt
+def signalRepeatedAnswer(request):
+    if request.method == 'POST':
+        game_state = data_handler.get_current_game_state_as_dict()
+        game_state['fast_money']['repeated_answer'] = True
+        data_handler.send_current_game_state(game_state)
+        return JsonResponse({'isSuccessful': True})

@@ -345,6 +345,7 @@
         methods: {
             receiveMessage: function (e) {
                 let data = JSON.parse(e.data);
+                console.log(data)
                 this.state = data.state;
                 this.showX();
             },
