@@ -20,6 +20,14 @@
             <img src="{% static 'base/realauctioncountyfeudedition.png'%}">
         </div>
     </div>
+
+    <transition name="bounce">
+        <div v-if="state.display_picture"  class="picture">
+            <img  src="{% static 'base/image005.jpg'%}">
+      </div>
+    </transition>
+
+
     <div id="logo-background" v-if="(state.no_active_games )|| (state.display_logo)">
     </div>
     <div id="game-background" v-if="!state.display_logo && !state.is_fast_money">
@@ -398,18 +406,19 @@
                     sound.currentTime = 0;
                     }, duration);
             },
+            // This function checks if a sound should play for a repeated answer.
             checkRepeatedAnswer:function(){
                 if (typeof this.state !== "undefined" && this.state.is_fast_money  
                 && this.state.fast_money.repeated_answer){
                     app.playSound(app.fmRepeat, 500);
                 }
-            }
+            },
 
         },
         computed: {
-            repeatedAnswer: function(){
-                if( typeof this.state.fast_money !== "undefined" &&
-                app.state.fast_money.repeated_answer){
+            displayPicture: function(){
+                if( typeof this.state.display_picture !== "undefined" &&
+                app.state.display_picture){
                     return true;
                 }
                 else{
@@ -499,6 +508,12 @@
             }
         },
         watch: {
+            displayPicture: function(newBool, oldBool){
+                if(typeof newBool != "undefined" && typeof oldBool != "undefined" &&
+                newBool === true && oldBool === false){
+                    app.playSound(app.reveal, 1040)
+                }
+            },
             create_date: function(newDate, oldDate){
                 if( typeof newDate !== "undefined" && typeof oldDate !=="undefined"){
                     app.p1FinalTotal=0;
@@ -591,7 +606,43 @@
         background-color:black;
         font-family: arial;
     }
-
+    .picture {
+        position: fixed;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        align-content: center;
+        width: 800px;
+        height: 600px;
+        padding: 5px;
+        background-image: radial-gradient(lightblue, darkblue),url('{% static 'base/backgroundslow.gif' %}');
+        background-blend-mode: soft-light;
+    }
+    .picture img {
+        border-radius: 5px;
+        width: 650px;
+    }
+    .bounce-transition: {
+        display: inline-block;
+    }
+    .bounce-enter-active {
+        animation: bounce-in .6s;
+    }
+    .bounce-leave-active {
+        animation: bounce-in .6s reverse;
+    }
+    @keyframes bounce-in {
+        0% {
+            transform: scale(0);
+        }
+        50% {
+            transform: scale(1.5);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
     {% comment %} .logo-oval {
         display: flex;
         justify-content: center;
@@ -647,7 +698,7 @@
 
 
     }
-.congrats-img {
+    .congrats-img {
         background-color:darkblue;
         width: 800px;
 
