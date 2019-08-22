@@ -64,6 +64,7 @@ def get_current_game_state_as_dict():
         'last_question': last_question,
         'create_date': current_game_status.create_date.__str__(),
         'display_logo': current_game_status.display_logo,
+        'display_picture': current_game_status.display_picture,
         'current_answers': current_answers,
         'points_awarded': current_game_status.points_awarded,
         'is_fast_money': current_game_status.is_fast_money,
@@ -213,6 +214,12 @@ def editTeamPoints(team_one_points, team_two_points):
 def toggleLogo(display_logo):
     current_game_status = getCurrentGameStatus()
     current_game_status.display_logo = display_logo
+    current_game_status.save()
+    return {'isSuccessful': True}
+
+def togglePicture(display_picture):
+    current_game_status = getCurrentGameStatus()
+    current_game_status.display_picture = display_picture
     current_game_status.save()
     return {'isSuccessful': True}
     

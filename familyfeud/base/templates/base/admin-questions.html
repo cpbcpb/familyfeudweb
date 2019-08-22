@@ -11,6 +11,8 @@
 </head>
 <body>
     <div id="app">
+        <button v-if="!state.no_active_game && !state.display_picture" v-on:click="togglePicture('1')" class="btn btn-danger">Show Picture</button>
+        <button v-if="!state.no_active_game && state.display_picture" v-on:click="togglePicture('0')" class="btn btn-primary">Hide Picture</button>
         <div class="newGameSectionWrapper">
             <div class="newGameSection  white-container">
                 <h2>Start New Game</h2>
@@ -620,6 +622,19 @@
                 axios({
                     method: 'post',
                     url: '/base/admin/signalRepeatedAnswer/'
+                })
+            },
+            togglePicture: function(displayIt) {
+                var formData = new FormData();
+                formData.set('display_picture', displayIt);
+                axios({
+                    method: 'post',
+                    url: '/base/admin/togglePicture/',
+                    data: formData
+                }).then(function (response) {
+                    if (response['data']['isSuccessful']) {
+                        app.state = response['data']['state']
+                    }
                 })
             },
 

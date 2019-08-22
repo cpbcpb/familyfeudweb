@@ -338,3 +338,17 @@ def signalRepeatedAnswer(request):
         game_state['fast_money']['repeated_answer'] = True
         data_handler.send_current_game_state(game_state)
         return JsonResponse({'isSuccessful': True})
+
+@csrf_exempt
+def togglePicture(request):
+    if request.method == 'POST':
+        if request.POST['display_picture'] == '1':
+            display_picture = True
+        else:
+            display_picture = False
+        
+        data_response = data_handler.togglePicture(display_picture)
+        
+        if data_response['isSuccessful']:
+            data_handler.send_current_game_state(data_handler.get_current_game_state_as_dict())
+        return setJsonResponse(data_response)

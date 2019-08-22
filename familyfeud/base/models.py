@@ -37,6 +37,7 @@ class GameStatus(models.Model):
     question_total = models.IntegerField(default=0)
     question_total_wrong = models.IntegerField(default=0)
     display_logo = models.BooleanField(default=True)
+    display_picture = models.BooleanField(default=False)
     create_date = models.DateTimeField(default=now)
     points_awarded = models.BooleanField(default=False)
     displayed_answers = models.ManyToManyField(Answer, blank=True)
