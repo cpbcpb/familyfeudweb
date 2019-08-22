@@ -191,8 +191,8 @@
                                 </div>
                                 <div class="fm-box fm-points-box">
 
-                                {% comment %} <div class="blinky" v-show="question.player_1_answer.display_answer && !question.player_1_answer.display_value"></div>
-                                {% endcomment %}
+                                <div class="blinky" v-show="question.player_1_answer.display_answer && !question.player_1_answer.display_value"></div>
+                                
                                 <span v-show="question.player_1_answer.display_value">[[question.player_1_answer.point_value]]</span>
                                 </div>
                             </div>
@@ -208,7 +208,7 @@
                                 </div>
                                 <div class="fm-box fm-points-box">
 
-                                {% comment %} <div class="blinky" v-show="question.player_2_answer.display_answer && !question.player_2_answer.display_value"></div> {% endcomment %}
+                               <div class="blinky" v-show="question.player_2_answer.display_answer && !question.player_2_answer.display_value"></div> 
 
                                 <span v-show="question.player_2_answer.display_value">[[question.player_2_answer.point_value]]</span>
                                 </div>
@@ -216,12 +216,37 @@
 
                         </div>
                     </div>
-                    <div class="fm-total-row">
-                        <div id= "fm-total-1" class="fm-box">
+                    <div class="fm-total-row" v-if="state.fast_money.cooperative">
+                        <div class="placeholder-blank">
+                            <div class="fm-box fm-total-box" v-if="state.fast_money.current_player==1">
+                                <div> TOTAL</div>
+                                <div v-if="!p1FinalTotal">[[fastMoneyPlayer1Total]]</div>
+                                <div v-else>[[p1FinalTotal]]</div>
+                            </div>
+                            <div v-else>&nbsp
+                            </div>
+                        </div>
+                        <div class="placeholder-blank">.
+                            <div class="fm-box fm-total-box" v-if="state.fast_money.current_player==2">
+                                <div> TOTAL</div>
+                                <div>[[cooperativeP2Total]]</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="fm-total-row" v-if="!state.fast_money.cooperative">
+                        <div class="fm-box fm-total-box">
                             <div> TOTAL</div>
                             <div v-if="!p1FinalTotal">[[fastMoneyPlayer1Total]]</div>
                             <div v-else>[[p1FinalTotal]]</div>
                         </div>
+                        <div class="fm-box fm-total-box">
+                            <div> TOTAL</div><div>[[fastMoneyPlayer2Total]]</div>
+                        </div>
+                    </div>
+                    <div style="position: relative;
+                    left: 296px;
+                    bottom: 20px; height: 90px;">&nbsp
                         <timer
                             v-bind:timer="state.fast_money.timer"
                             v-bind:display_timer="state.fast_money.display_timer"
@@ -229,9 +254,6 @@
                             v-bind:stop_timer="state.fast_money.stop_timer"
                         >
                         </timer>
-                        <div id="fm-total-2" class="fm-box">
-                            <div> TOTAL</div><div>[[fastMoneyPlayer2Total]]</div>
-                        </div>
                     </div>
                 </div>
 
@@ -338,6 +360,7 @@
             fmRevealPoints: new Audio('{% static 'base/reveal-fastmoney.mp3' %}'),
             fmRevealZero: new Audio('{% static 'base/buzz.mp3' %}'),
             fmOutOfTime: new Audio('{% static 'base/buzz.mp3' %}'),
+            fmRepeat: new Audio('{% static 'base/fastmoney-repeat.mp3' %}'),
             //player 1's final total in fast money round.
             p1FinalTotal: 0,
             state: {display_logo: true},
@@ -345,9 +368,10 @@
         methods: {
             receiveMessage: function (e) {
                 let data = JSON.parse(e.data);
-                console.log(data)
+                console.log(data.state.fast_money)
                 this.state = data.state;
                 this.showX();
+                this.checkRepeatedAnswer();
             },
             showX : function () {
                 let timeToShowX = 800;
@@ -373,9 +397,25 @@
                     //tells sound to reset to begining of mp3.
                     sound.currentTime = 0;
                     }, duration);
+            },
+            checkRepeatedAnswer:function(){
+                if (typeof this.state !== "undefined" && this.state.is_fast_money  
+                && this.state.fast_money.repeated_answer){
+                    app.playSound(app.fmRepeat, 500);
+                }
             }
+
         },
         computed: {
+            repeatedAnswer: function(){
+                if( typeof this.state.fast_money !== "undefined" &&
+                app.state.fast_money.repeated_answer){
+                    return true;
+                }
+                else{
+                    return false;
+                }
+            },
             create_date: function(){
                 return this.state.create_date;
             },
@@ -426,10 +466,24 @@
                         }       
                     })
                     if(showCounter >= this.state.fast_money.questions.length){
+                        if(total > app.p1FinalTotal){
                         app.p1FinalTotal = total;
+                        }
                     }
                     return total;
                 }
+            },
+            cooperativeP2Total : function(){
+                if(this.state.is_fast_money && this.state.fast_money.cooperative){
+                    let total = this.state.fast_money.player_1_score;
+                    this.state.fast_money.questions.forEach(function(question){
+                        if(question.player_2_answer.display_value){
+                            total += question.player_2_answer.point_value;
+                        }
+                    })
+                    return total;
+                }
+
             },
             fastMoneyPlayer2Total : function(){
                 if(this.state.is_fast_money){
@@ -975,9 +1029,6 @@ for the initial reveal of the game board in a regular round. {% endcomment %}
         align-items: center;
         height: 100%;
     }
-    {% comment %} .center-logo-fm .logo-oval {
-    width: 750px;
-    } {% endcomment %}
 
     .fast-money-grid {
         font-family:  'Gill Sans Condensed', 'Arial Narrow', arial;
@@ -1011,12 +1062,15 @@ for the initial reveal of the game board in a regular round. {% endcomment %}
         padding: 8px 0 8px 0;
     }
     .fm-box {
+        font-family: "Arial Narrow";
+        font-stretch: condensed;
         display: flex;
         align-items: center;
         color: white;
         background-color: black;
         margin: 1px;
-        font-size : 28px;
+        font-size : 30px;
+        font-weight: 500;
         padding-left: 8px;
         padding-right: 8px;
         padding-top: 0px;
@@ -1025,14 +1079,18 @@ for the initial reveal of the game board in a regular round. {% endcomment %}
         border-radius: 5px;
         height: 50px;
     }
+
     .fm-answer-box {
-        width:78%;
+        width:80%;
+        margin-right: 4px;
     }
     .fm-points-box {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
         display: flex;
         align-content: center;
         justify-content: center;
-        width: 18%;
+        width: 15%;
     }
     .fast-money-big-row {
         display: flex;
@@ -1040,19 +1098,36 @@ for the initial reveal of the game board in a regular round. {% endcomment %}
         width: 100%;
     }
 
-    {% comment %} .blinky {
-        height: 100%;
-        width: 100%;
+    .blinky {
+
+        height: 42px;
+        width: 44px;
         animation-delay: 1.5s;
         animation: blink .8s infinite;
+        border-radius: 4px;
     }
     @keyframes blink {
         0%{background-color: black}
         45%{background-color: black}
-        55%{background-color: red}
-        90%{background-color: red}
-    } {% endcomment %}
+        55%{background-color: #A00;}
+        90%{background-color: #A00; }
+    } 
 
+    .placeholder-blank {
+        width 230px;
+        min-height: 1px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-top: 10px;
+        margin-left: 4px;
+        margin-right: 4px;
+    }
+    .placeholder-blank:after {
+        content: ".";
+        visibility:hidden;
+    }
     .fm-total-row {
         display: flex;
         flex-direction: row;
@@ -1062,22 +1137,16 @@ for the initial reveal of the game board in a regular round. {% endcomment %}
         margin-left: 4px;
         margin-right: 4px;
     }
-    #fm-total-1 {
+
+    .fm-total-box {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
-        width: 30%;
+        width: 230px;
         padding: 0 10px 0 10px;
         height: 50px;
     }
-    #fm-total-2 {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        width: 30%;
-        padding: 0 10px 0 10px;
-        height: 50px;
-    }
+
 
     .timer {
         display: flex;
@@ -1094,7 +1163,6 @@ for the initial reveal of the game board in a regular round. {% endcomment %}
         border-radius: 50%;
         font-size: 56px;
         font-weight: bold;
-        margin-bottom: -75px;
         line-height: 1.3em;
     }
 
